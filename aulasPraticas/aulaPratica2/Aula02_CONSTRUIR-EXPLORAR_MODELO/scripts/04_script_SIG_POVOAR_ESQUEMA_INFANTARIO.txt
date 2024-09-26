@@ -1,0 +1,75 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+
+--================
+-- Actualizar Cliente
+--================
+
+UPDATE Cliente
+SET local = STGeometryFromText('Point(10 20)')
+WHERE codigo=15;
+
+UPDATE Cliente
+SET local = STGeometryFromText('Point(30 20)')
+WHERE codigo=2;
+
+UPDATE Cliente
+SET local = STGeometryFromText('Point(30 40)')
+WHERE codigo=333;
+
+
+
+--================
+-- Actualizar Infantario
+--================
+
+UPDATE Infantario
+SET local = STGeometryFromText('POINT(40 10)')
+WHERE nome='Fraldas';
+
+
+UPDATE Infantario
+SET local = STGeometryFromText('POINT(20 30)')
+WHERE nome='Ursinho';
+
+
+
+--============
+-- Povoar <ER>
+--============
+
+-- DELETE FROM <ER>
+;
+
+INSERT INTO Freguesia 
+VALUES 
+('Lumiar', STGeometryFromText('POLYGON((10.00 10.00, 10.00 40.00, 20.00 30.00, 10.00 10.00))'))
+
+
+
+-- INSERT INTO <ER>( ...
+-- VALUES ...
+;
+
+
+
+

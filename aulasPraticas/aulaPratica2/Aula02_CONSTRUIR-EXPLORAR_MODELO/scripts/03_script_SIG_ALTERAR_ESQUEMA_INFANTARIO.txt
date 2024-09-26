@@ -1,0 +1,65 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+-- NOTA: completar em <XX>
+--==========================
+
+
+DROP TABLE IF EXISTS Freguesia;
+
+----------------------------------------------
+-- Criar Esquemas de Relacao
+-- (que derivem de Entidades e de Associacoes)
+----------------------------------------------
+
+-- Esquema de Relacao Freguesia
+CREATE TABLE Freguesia (
+    nome VARCHAR(255) PRIMARY KEY
+);
+
+
+---------------------------------------------
+-- Criar Atributos que derivem de Associacoes
+---------------------------------------------
+
+
+-------------------------------------------------
+-- Criar as Restricoes de Integridade de Entidade
+-------------------------------------------------
+
+
+-------------------------------------------------
+-- Criar as Restricoes de Integridade Referencial
+-------------------------------------------------
+
+-------------------------------
+-- Criar os Atributos Espaciais
+-------------------------------
+
+-- <ER>
+--=============================
+-- local Cliente
+SELECT AddGeometryColumn('public', 'cliente', 'local', 0, 'Point', 2);
+
+
+-- local Infantario
+SELECT AddGeometryColumn('public', 'infantario', 'local', 0, 'Point', 2);
+
+
+-- Freguesia
+SELECT AddGeometryColumn('public', 'freguesia', 'local', 0, 'Polygon', 2);
+

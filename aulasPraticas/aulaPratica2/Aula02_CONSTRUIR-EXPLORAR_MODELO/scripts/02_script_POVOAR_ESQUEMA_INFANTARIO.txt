@@ -1,0 +1,64 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+-- NOTA: completar em <XX>
+--==========================
+
+
+
+
+-- <ER>
+--=============================
+INSERT INTO Cliente (codigo, bi, nomeProprio, apelido)
+VALUES 
+    (15, 83838383, 'Joana', 'Vilhena'), 
+    (2, 11111111, 'Pedro', 'Silva'), 
+    (333, 55555555, 'Miguel', 'Mendes');
+
+
+-- <ER>
+--=============================
+INSERT INTO Infantario (nome)
+VALUES ('Fraldas'), ('Ursinho');
+
+
+-- <ER>
+--=============================
+INSERT INTO Filho (bi, nomeProprio, dataNascimento, fk_cliente)
+VALUES 
+    (12345678, 'Paulo', '2020-12-10', 15),
+    (23840940, 'Josefina', '2021-04-26', 15),
+    (20843842, 'Arlindo', '2022-08-10', 2),
+    (19734802, 'Carlota', '2024-01-13', 333);
+
+
+
+
+-- <ER>
+--=============================
+-- INSERT INTO <ER>( ...
+-- VALUES( ...
+;
+
+-- INSERT INTO <ER>( ...
+-- VALUES( ...
+;
+
+-- ...
+
+
+

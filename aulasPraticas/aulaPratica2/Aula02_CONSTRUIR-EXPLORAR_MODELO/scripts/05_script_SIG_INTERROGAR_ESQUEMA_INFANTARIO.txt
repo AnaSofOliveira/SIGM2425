@@ -1,0 +1,86 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+-- mais informação sobre "client_encoding" em:
+-- http://www.postgresql.org/docs/9.4/static/multibyte.html
+\encoding WIN1250
+;
+
+
+
+
+--===================
+-- Interrogar CLIENTE
+--===================
+
+-- Ponto geografico de cada cliente
+
+-- SELECT ...
+;
+
+
+-- cada uma das coordenadas (ordenadas e abcissa) do ponto geográfico de cada cliente
+
+-- SELECT ...
+;
+
+
+
+
+--=====================
+-- Interrogar FREGUESIA
+--=====================
+
+-- Espaço geografico delimitado por cada freguesia
+
+-- SELECT ...
+;
+
+
+-- Área ocupada por cada freguesia
+
+-- SELECT ...
+;
+
+
+
+
+--==================================
+-- Interrogar INFANTARIO e FREGUESIA
+--==================================
+
+-- Infantários (nome e geometria) de cada freguesia (nome e geometria)
+-- considerando apenas operações espaciais
+
+-- SELECT ...
+;
+
+
+-- Distância de cada cliente a cada infantário indicando o seu nome próprio e de família
+
+-- SELECT ...
+;
+
+
+-- nome do infantário e num único campo o nome próprio e de família dos clientes
+-- que vivem a uma distância superior a 20 (unidades) de algum infantário
+
+-- SELECT ...
+;
