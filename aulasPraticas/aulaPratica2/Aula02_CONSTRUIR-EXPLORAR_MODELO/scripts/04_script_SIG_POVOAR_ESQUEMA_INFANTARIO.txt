@@ -1,5 +1,5 @@
 --#############
---# Paulo Trigo
+--# GRUPO 04
 --#############
 
 
@@ -25,15 +25,15 @@
 --================
 
 UPDATE Cliente
-SET local = STGeometryFromText('Point(10 20)')
+SET local = ST_GeomFromText('POINT(10 20)', 0)
 WHERE codigo=15;
 
 UPDATE Cliente
-SET local = STGeometryFromText('Point(30 20)')
+SET local = ST_GeomFromText('POINT(30 20)', 0)
 WHERE codigo=2;
 
 UPDATE Cliente
-SET local = STGeometryFromText('Point(30 40)')
+SET local = ST_GeomFromText('POINT(30 40)', 0)
 WHERE codigo=333;
 
 
@@ -43,12 +43,12 @@ WHERE codigo=333;
 --================
 
 UPDATE Infantario
-SET local = STGeometryFromText('POINT(40 10)')
+SET local = ST_GeomFromText('POINT(40 10)', 0)
 WHERE nome='Fraldas';
 
 
 UPDATE Infantario
-SET local = STGeometryFromText('POINT(20 30)')
+SET local = ST_GeomFromText('POINT(20 30)', 0)
 WHERE nome='Ursinho';
 
 
@@ -57,18 +57,15 @@ WHERE nome='Ursinho';
 -- Povoar <ER>
 --============
 
--- DELETE FROM <ER>
-;
-
-INSERT INTO Freguesia 
+INSERT INTO Freguesia (nome,lucro, local)
 VALUES 
-('Lumiar', STGeometryFromText('POLYGON((10.00 10.00, 10.00 40.00, 20.00 30.00, 10.00 10.00))'))
+(
+    'Lumiar',
+    1,
+    ST_GeomFromText('POLYGON((10.00 10.00, 10.00 40.00, 20.00 30.00, 10.00 10.00))',0)
+)
 
 
-
--- INSERT INTO <ER>( ...
--- VALUES ...
-;
 
 
 

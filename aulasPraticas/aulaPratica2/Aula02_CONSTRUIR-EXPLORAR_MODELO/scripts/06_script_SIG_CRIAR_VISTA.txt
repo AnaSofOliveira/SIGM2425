@@ -1,12 +1,12 @@
 --#############
---# Paulo Trigo
+--# GRUPO 04
 --#############
 
 
 
 
 --=============
--- Ligação à BD
+-- Ligaï¿½ï¿½o ï¿½ BD
 --=============
 \set dataBase my_gis
 ;
@@ -18,32 +18,32 @@
 --==========================
 
 
--- mais informação sobre "client_encoding" em:
+-- mais informaï¿½ï¿½o sobre "client_encoding" em:
 -- http://www.postgresql.org/docs/9.4/static/multibyte.html
-\encoding WIN1250
+\encoding UTF8
 ;
 
 
 
 
 --=========================================
--- Quais os infantários de cada freguesia ?
+-- Quais os infantï¿½rios de cada freguesia ?
 --=========================================
--- Atencao: a vista deve projectar o atributo "oid" ou uma chave primária
+-- Atencao: a vista deve projectar o atributo "oid" ou uma chave primï¿½ria
 --          do tipo "integer" de modo a ser apresentada no QGis
 --=======================================================================
 
-DROP VIEW v_inf_frg
+DROP VIEW IF EXISTS v_inf_frg;
+
+SELECT I.lucro, FRG.nome, FRG.area
+FROM infantario AS I,
+(
+    SELECT nome, ST_Area(F.local) AS area , F.local AS f_local
+    FROM freguesia AS F
+) AS FRG(nome, area, f_local)
+-- WHERE ST_Within( I.local, FRG.f_local ) = true
 ;
 
-
--- CREATE VIEW v_inf_frg( oid, nome_infantario, nome_freguesia_residencia, nome_freguesia_infantario, g_local_cliente )
--- AS
-- SELECT ...
+-- SELECT nome_infantario, nome_freguesia_residencia, nome_freguesia_infantario, ST_AsText( g_local_cliente )
+-- FROM v_inf_frg;
 ;
-
-
-SELECT nome_infantario, nome_freguesia_residencia, nome_freguesia_infantario, ST_AsText( g_local_cliente )
-FROM v_inf_frg
-;
-

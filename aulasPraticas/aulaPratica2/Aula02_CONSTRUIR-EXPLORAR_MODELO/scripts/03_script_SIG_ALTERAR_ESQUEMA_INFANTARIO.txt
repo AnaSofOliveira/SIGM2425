@@ -1,5 +1,5 @@
 --#############
---# Paulo Trigo
+--# GRUPO 04
 --#############
 
 
@@ -28,7 +28,8 @@ DROP TABLE IF EXISTS Freguesia;
 
 -- Esquema de Relacao Freguesia
 CREATE TABLE Freguesia (
-    nome VARCHAR(255) PRIMARY KEY
+    nome VARCHAR(255) PRIMARY KEY,
+    lucro INT 
 );
 
 

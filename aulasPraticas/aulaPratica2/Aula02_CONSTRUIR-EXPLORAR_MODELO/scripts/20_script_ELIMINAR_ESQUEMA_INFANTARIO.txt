@@ -6,7 +6,7 @@
 
 
 --=============
--- Ligação à BD
+-- Ligaï¿½ï¿½o ï¿½ BD
 --=============
 \set dataBase my_gis
 ;
@@ -21,32 +21,21 @@
 --==============================
 -- Eliminar o Esquema Relacional
 --==============================
-ALTER TABLE <ER>
-DROP CONSTRAINT fk1_<ER>
-;
+
+ALTER TABLE Filho
+DROP CONSTRAINT IF EXISTS fk_cliente;
+
+ALTER TABLE Filho
+DROP CONSTRAINT IF EXISTS fk_infantario;
 
 
-ALTER TABLE <ER>
-DROP CONSTRAINT fk1_<ER>
-;
+DROP TABLE IF EXISTS Cliente;
 
 
-ALTER TABLE <ER>
-DROP CONSTRAINT fk1_<ER>
-;
+DROP TABLE IF EXISTS Filho;
 
 
-DROP TABLE <ER>
-;
+DROP TABLE IF EXISTS Infantario;
 
 
-DROP TABLE <ER>
-;
-
-
-DROP TABLE <ER>
-;
-
-
-DROP TABLE <ER>
-;
+DROP TABLE IF EXISTS freguesia;

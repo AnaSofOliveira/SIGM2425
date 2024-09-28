@@ -1,12 +1,12 @@
 --#############
---# Paulo Trigo
+--# GRUPO 04
 --#############
 
 
 
 
 --=============
--- Ligação à BD
+-- Ligaï¿½ï¿½o ï¿½ BD
 --=============
 \set dataBase my_gis
 ;
@@ -18,7 +18,7 @@
 --==========================
 
 
--- mais informação sobre "client_encoding" em:
+-- mais informaï¿½ï¿½o sobre "client_encoding" em:
 -- http://www.postgresql.org/docs/9.4/static/multibyte.html
 \encoding WIN1250
 ;
@@ -32,32 +32,27 @@
 
 -- Ponto geografico de cada cliente
 
--- SELECT ...
-;
+SELECT ST_AsText(local) AS point FROM cliente;
 
+-- cada uma das coordenadas (ordenadas e abcissa) do ponto geogrï¿½fico de cada cliente
 
--- cada uma das coordenadas (ordenadas e abcissa) do ponto geográfico de cada cliente
-
--- SELECT ...
-;
-
-
+SELECT ST_X(local) AS x, ST_Y(local) AS y FROM cliente ORDER BY x,y;
 
 
 --=====================
 -- Interrogar FREGUESIA
 --=====================
 
--- Espaço geografico delimitado por cada freguesia
+-- Espaï¿½o geografico delimitado por cada freguesia
 
--- SELECT ...
-;
+SELECT ST_Extent(local) AS espaco FROM freguesia;
 
 
--- Área ocupada por cada freguesia
 
--- SELECT ...
-;
+-- ï¿½rea ocupada por cada freguesia
+
+SELECT ST_Area(local) AS area FROM freguesia;
+
 
 
 
@@ -66,21 +61,58 @@
 -- Interrogar INFANTARIO e FREGUESIA
 --==================================
 
--- Infantários (nome e geometria) de cada freguesia (nome e geometria)
--- considerando apenas operações espaciais
+-- Infantï¿½rios (nome e geometria) de cada freguesia (nome e geometria)
+-- considerando apenas operaï¿½ï¿½es espaciais
 
--- SELECT ...
+SELECT
+    freguesia.nome AS nome_freguesia,
+    ST_AsText(freguesia.local) AS local_freguesia,
+    infantario.nome as nome_infantario,
+    ST_AsText(infantario.local) AS local_infantario
+FROM
+    freguesia
+JOIN
+    infantario
+ON 
+    ST_Intersects(freguesia.local, infantario.local)   
 ;
 
 
--- Distância de cada cliente a cada infantário indicando o seu nome próprio e de família
 
--- SELECT ...
-;
+SELECT
+    freguesia.nome AS nome_freguesia,
+    ST_AsText(freguesia.local) AS local_freguesia,
+    infantario.nome as nome_infantario,
+    ST_AsText(infantario.local) AS local_infantario
+FROM
+    freguesia
+JOIN
+    infantario
+ON 
+    ST_Within(freguesia.local, infantario.local);  -- don't showing because it is not completely within geometry
 
 
--- nome do infantário e num único campo o nome próprio e de família dos clientes
--- que vivem a uma distância superior a 20 (unidades) de algum infantário
+-- Distï¿½ncia de cada cliente a cada infantï¿½rio indicando o seu nome prï¿½prio e de famï¿½lia
 
--- SELECT ...
-;
+SELECT
+    nomeproprio AS nome_proprio,
+    apelido AS familia,
+    infantario.nome AS nome_infantario,
+    ST_Distance(cliente.local, infantario.local) AS distancia
+FROM
+    cliente,
+    infantario;
+
+
+-- nome do infantï¿½rio e num ï¿½nico campo o nome prï¿½prio e de famï¿½lia dos clientes
+-- que vivem a uma distï¿½ncia superior a 20 (unidades) de algum infantï¿½rio
+
+SELECT
+    infantario.nome AS nome_infantario,
+    TEXTCAT(TEXTCAT(cliente.nomeproprio, ' '), cliente.apelido) AS nome
+FROM
+    infantario
+JOIN
+    cliente
+ON
+    ST_Distance(infantario.local, cliente.local) > 20;
