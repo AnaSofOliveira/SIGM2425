@@ -22,6 +22,15 @@
 -- Eliminar o Esquema Relacional
 --==============================
 
+DROP VIEW IF EXISTS v_cli_frg;
+DROP VIEW IF EXISTS v_inf_lucro;
+DROP VIEW IF EXISTS v_inf_c_100;
+DROP VIEW IF EXISTS v_inf_chi;
+
+DROP VIEW IF EXISTS v_inf_frg;
+DROP VIEW IF EXISTS v_inf_prox;
+DROP VIEW IF EXISTS v_inf_cli_frg;
+
 ALTER TABLE Filho
 DROP CONSTRAINT IF EXISTS fk_cliente;
 

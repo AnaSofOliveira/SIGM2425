@@ -33,7 +33,7 @@ VALUES
 -- <ER>
 --=============================
 INSERT INTO Infantario (nome)
-VALUES ('Fraldas'), ('Ursinho');
+VALUES ('Fraldas'), ('Ursinho'), ('Pinoquio');
 
 
 -- <ER>
