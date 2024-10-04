@@ -19,11 +19,6 @@
 -- NOTA: completar em <XX>
 --==========================
 
-
-DROP TABLE IF EXISTS Filho;
-DROP TABLE IF EXISTS Cliente;
-DROP TABLE IF EXISTS Infantario;
-
 ----------------------------------------------
 -- Criar Esquemas de Relacao
 -- (que derivem de Entidades e de Associacoes)

@@ -18,8 +18,6 @@
 -- NOTA: completar em <XX>
 --==========================
 
-DROP TABLE IF EXISTS Freguesia;
-
 ----------------------------------------------
 -- Criar Esquemas de Relacao
 -- (que derivem de Entidades e de Associacoes)

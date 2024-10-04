@@ -30,30 +30,41 @@
 -- Interrogar CLIENTE
 --===================
 
--- Ponto geografico de cada cliente
+\echo -> Ponto Geografico de cada Cliente:
+SELECT 
+    nomeproprio || ' ' || apelido as "Nome do Cliente Completo",
+    ST_AsText(local) AS "Localizacao" 
+FROM cliente;
 
-SELECT ST_AsText(local) AS point FROM cliente;
 
--- cada uma das coordenadas (ordenadas e abcissa) do ponto geogr�fico de cada cliente
-
-SELECT ST_X(local) AS x, ST_Y(local) AS y FROM cliente ORDER BY x,y;
+\echo -> Coordenadas do ponto Geografico de cada Cliente:
+SELECT 
+    nomeproprio || ' ' || apelido as "Nome do Cliente Completo",
+    ST_X(local) AS "Abcissa(X)", 
+    ST_Y(local) AS "Ordenada(Y)"
+FROM cliente ORDER BY "Nome do Cliente Completo";
 
 
 --=====================
 -- Interrogar FREGUESIA
 --=====================
 
--- Espa�o geografico delimitado por cada freguesia
+\echo -> Espaco Geografico delimitado por cada Freguesia:
+SELECT 
+    nome as "Freguesia", 
+    ST_Extent(local) AS "Espaco Geografico" 
+FROM 
+    freguesia
+GROUP BY 
+    nome;
 
-SELECT ST_Extent(local) AS espaco FROM freguesia;
 
-
-
--- �rea ocupada por cada freguesia
-
-SELECT ST_Area(local) AS area FROM freguesia;
-
-
+\echo -> Area ocupada por cada Freguesia:
+SELECT 
+    nome as "Freguesia", 
+    ST_Area(local) AS "Area" 
+FROM 
+    freguesia;
 
 
 
@@ -61,55 +72,55 @@ SELECT ST_Area(local) AS area FROM freguesia;
 -- Interrogar INFANTARIO e FREGUESIA
 --==================================
 
--- Infant�rios (nome e geometria) de cada freguesia (nome e geometria)
--- considerando apenas opera��es espaciais
-
+\echo -> [ST_Intersects] Infantarios de cada Freguesia (considerando apenas operacoes espaciais)
 SELECT
-    freguesia.nome AS nome_freguesia,
-    ST_AsText(freguesia.local) AS local_freguesia,
-    infantario.nome as nome_infantario,
-    ST_AsText(infantario.local) AS local_infantario
+    freguesia.nome AS "Nome da Freguesia",
+    ST_AsText(freguesia.local) AS "Geometria da Freguesia",
+    infantario.nome as "Nome do Infantario",
+    ST_AsText(infantario.local) AS "Localizacao do Infantario"
 FROM
     freguesia
-JOIN
+LEFT JOIN
     infantario
 ON 
     ST_Intersects(freguesia.local, infantario.local)   
 ;
 
 
-
+\echo -> [ST_Within] Infantarios de cada Freguesia (considerando apenas operacoes espaciais)
 SELECT
-    freguesia.nome AS nome_freguesia,
-    ST_AsText(freguesia.local) AS local_freguesia,
-    infantario.nome as nome_infantario,
-    ST_AsText(infantario.local) AS local_infantario
+    freguesia.nome AS "Nome da Freguesia",
+    ST_AsText(freguesia.local) AS "Geometria da Freguesia",
+    infantario.nome as "Nome do Infantario",
+    ST_AsText(infantario.local) AS "Localizacao do Infantario"
 FROM
     freguesia
 JOIN
     infantario
 ON 
-    ST_Within(freguesia.local, infantario.local);  -- don't showing because it is not completely within geometry
+    ST_Within(infantario.local, freguesia.local);
 
 
--- Dist�ncia de cada cliente a cada infant�rio indicando o seu nome pr�prio e de fam�lia
 
+
+\echo -> Distancia de cada Cliente a cada Infantario
 SELECT
-    nomeproprio AS nome_proprio,
-    apelido AS familia,
-    infantario.nome AS nome_infantario,
-    ST_Distance(cliente.local, infantario.local) AS distancia
+    cliente.nomeproprio || ' ' || cliente.apelido as "Nome Completo",
+    ST_AsText(cliente.local) as "Localizacao do Cliente", 
+    infantario.nome AS "Nome Infantario",
+    ST_AsText(infantario.local) as "Localizacao do Infantario",
+    ROUND(ST_Distance(cliente.local, infantario.local)::NUMERIC, 3) AS "Distancia"
 FROM
     cliente,
     infantario;
 
 
--- nome do infant�rio e num �nico campo o nome pr�prio e de fam�lia dos clientes
--- que vivem a uma dist�ncia superior a 20 (unidades) de algum infant�rio
 
+\echo -> Clientes que vivem a uma Distancia Superior de 20 (unidades) de algum Infantario 
 SELECT
-    infantario.nome AS nome_infantario,
-    TEXTCAT(TEXTCAT(cliente.nomeproprio, ' '), cliente.apelido) AS nome
+    infantario.nome AS "Localizacao do Infantario",
+    cliente.nomeproprio || ' ' || cliente.apelido as "Nome do Cliente Completo",
+    ROUND(ST_Distance(cliente.local, infantario.local)::NUMERIC, 3) AS "Distancia"
 FROM
     infantario
 JOIN

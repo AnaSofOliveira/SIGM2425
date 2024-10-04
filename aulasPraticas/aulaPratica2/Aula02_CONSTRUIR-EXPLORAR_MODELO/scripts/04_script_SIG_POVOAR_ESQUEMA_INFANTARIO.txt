@@ -46,7 +46,6 @@ UPDATE Infantario
 SET local = ST_GeomFromText('POINT(40 10)', 0)
 WHERE nome='Fraldas';
 
-
 UPDATE Infantario
 SET local = ST_GeomFromText('POINT(20 30)', 0)
 WHERE nome='Ursinho';
@@ -61,13 +60,14 @@ WHERE nome='Pinoquio';
 -- Povoar <ER>
 --============
 
-INSERT INTO Freguesia (nome,lucro, local)
+INSERT INTO Freguesia (nome, lucro, local)
 VALUES 
 (
     'Lumiar',
     3,
     ST_GeomFromText('POLYGON((10.00 10.00, 10.00 40.00, 20.00 30.00, 10.00 10.00))',0)
-),
+)
+,
 (
     'Alvalade',
     2,
@@ -80,6 +80,9 @@ VALUES
 )
 ;
 
+UPDATE Freguesia
+SET local = ST_GeomFromText('POLYGON((9.00 9.00, 10.00 40.00, 25.00 30.00, 15.00 15.00, 9.00 9.00))', 0)
+WHERE nome='Lumiar';
 
 
 
