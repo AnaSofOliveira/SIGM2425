@@ -1,0 +1,107 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis_gps
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+-- Eliminar Dados (anteriores)
+--=============================
+DELETE FROM gps_ponto;
+DELETE FROM TERRENO;
+DELETE FROM TIPO_TERRENO;
+---------------------------------
+
+
+----------------------------
+-- Povoar Dados
+----------------------------
+-- TIPO_TERRENO
+----------------------------
+--INSERT INTO tipo_terreno( id_tipo_terreno )
+--
+--);
+
+--INSERT INTO tipo_terreno( id_tipo_terreno )
+--
+--);
+
+
+
+----------------------------
+-- TERRENO
+----------------------------
+--INSERT INTO terreno( id_terreno, id_tipo_terreno )
+--
+--);
+
+--INSERT INTO terreno( id_terreno, id_tipo_terreno )
+--
+--);
+
+--INSERT INTO terreno( id_terreno, id_tipo_terreno )
+--
+--);
+
+
+
+----------------------------
+-- GPS_PONTO
+----------------------------
+-- INSERT INTO gps_ponto( 
+--
+--);
+
+
+
+
+
+----------------------------
+-- GPS_PONTO
+----------------------------
+--================================================================================================
+-- >> IMPORTANTE:
+-- >> DESCOMEMNTAR A PROXIMA LINHA NA RESPOSTA A QUESTAO 3 DO GUIAO DA AULA PRATICA
+-- >> (o QuantumGIS apenas regista o layer se ele tiver pelo menos 1 geometria)
+--================================================================================================
+-- INSERT INTO gps_ponto VALUES (1, 1,  ST_MakePoint( 0, 0 ) );
+
+
+
+
+--================================================================================================
+-- >> IMPORTANTE:
+-- >> AS PROXIMAS LINHAS SAO PARA COMPLETAR NA RESPOSTA AS QUESTOES 5 E 6 DO GUIAO DA AULA PRATICA
+--================================================================================================
+-- 1. Os pontos foram editados no QuantumGis e depois gravados no PostGis
+-- 2. Os INSERT foram gerado em:
+-- pgAdmin III \ Tools \ Backup \ com a configuracao:
+-- | File Options | Format: PLAIN"
+-- | Dump Options #1 | Only Data; Use Insert Commands
+-- INSERT INTO gps_ponto VALUES (1, 1, 
+
+
+-- 1. Os pontos foram editados no QuantumGis e depois gravados no PostGis
+-- 2. Os INSERT foram gerado em:
+-- pgAdmin III \ Tools \ Query Tool \ com a interrogacao:
+-- SELECT ST_AsText(g_ponto) FROM gps_ponto;
+-- e depois executando essa interrogacao para um ficheiro (em Query \ Execute to file)
+-- por fim substituindo no ficheiro gerado POINT por ST_MakePoint
+-- INSERT INTO gps_ponto VALUES (1, 1,  ST_MakePoint(
+
+
+
+
