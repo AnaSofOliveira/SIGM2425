@@ -1,0 +1,56 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+--=============
+-- Ligação à BD
+--=============
+\set dataBase my_gis_gps
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+--------------------------------
+-- Criar o Esquema Relacional
+--------------------------------
+-- DROP VIEW IF EXISTS V_
+
+DROP TABLE IF EXISTS gps_ponto;
+DROP TABLE IF EXISTS terreno;
+DROP TABLE IF EXISTS tipo_terreno;
+---------------------------------
+
+
+
+---------------------------------
+-- TIPO_TERRENO
+---------------------------------
+--CREATE TABLE tipo_terreno (
+--
+--);
+
+
+
+---------------------------------
+-- TERRENO
+---------------------------------
+--CREATE TABLE terreno (
+--             
+--);
+
+
+
+---------------------------------
+-- GPS_PONTO
+---------------------------------
+--CREATE TABLE gps_ponto (
+--
+--) WITH OIDS;
+
