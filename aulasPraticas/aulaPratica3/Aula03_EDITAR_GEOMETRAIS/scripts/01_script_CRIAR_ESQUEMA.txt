@@ -5,7 +5,7 @@
 
 
 --=============
--- Ligação à BD
+-- Ligaï¿½ï¿½o ï¿½ BD
 --=============
 \set dataBase my_gis_gps
 ;
@@ -32,25 +32,32 @@ DROP TABLE IF EXISTS tipo_terreno;
 ---------------------------------
 -- TIPO_TERRENO
 ---------------------------------
---CREATE TABLE tipo_terreno (
---
---);
+CREATE TABLE tipo_terreno (
+    ID_TIPO_TERRENO VARCHAR PRIMARY KEY
+);
 
 
 
 ---------------------------------
 -- TERRENO
 ---------------------------------
---CREATE TABLE terreno (
---             
---);
+CREATE TABLE terreno (
+    ID_TERRENO INTEGER PRIMARY KEY, 
+    ID_TIPO_TERRENO VARCHAR, 
+    CONSTRAINT FK1 FOREIGN KEY(ID_TIPO_TERRENO) REFERENCES tipo_terreno(ID_TIPO_TERRENO) 
+);
 
-
+SELECT AddGeometryColumn('public', 'terreno', 'G_TERRENO', 0, 'POLYGON', 2);
 
 ---------------------------------
 -- GPS_PONTO
 ---------------------------------
---CREATE TABLE gps_ponto (
---
---) WITH OIDS;
+CREATE TABLE gps_ponto (
+    ID_ORDEM INTEGER,
+    ID_TERRENO INTEGER, 
+    CONSTRAINT PK_GPS_PONTO PRIMARY KEY(ID_ORDEM, ID_TERRENO), 
+    CONSTRAINT FK1 FOREIGN KEY(ID_TERRENO) REFERENCES TERRENO(ID_TERRENO)
+);
+
+SELECT AddGeometryColumn('public', 'gps_ponto', 'G_PONTO', 0, 'POINT', 2);
 
