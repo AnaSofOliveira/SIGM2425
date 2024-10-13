@@ -26,6 +26,19 @@ from
 -- TERRENO
 -- (actualizar os poligonos)
 ----------------------------
+--- UPDATE TERRENO
+UPDATE 
+    TERRENO
+SET 
+    g_terreno = ( 
+        SELECT 
+            g_poligono
+        FROM 
+            V_POLIGONO AS VP
+        WHERE 
+            VP.id_terreno = TERRENO.id_terreno 
+    )
+;
 UPDATE 
     TERRENO
 SET 
