@@ -1,11 +1,11 @@
 --#############
---# Paulo Trigo
+--# GRUPO 04
 --#############
 
 
 
 --=============
--- Ligação à BD
+-- Ligaï¿½ï¿½o ï¿½ BD
 --=============
 \set dataBase my_gis_gps
 ;
@@ -21,11 +21,19 @@
 -- TERRENO
 -- (actualizar os poligonos)
 ----------------------------
---UPDATE TERRENO
---SET g_terreno = ( SELECT g_poligono
---
-
-
+--- UPDATE TERRENO
+UPDATE 
+    TERRENO
+SET 
+    g_terreno = ( 
+        SELECT 
+            g_poligono
+        FROM 
+            V_POLIGONO AS VP
+        WHERE 
+            VP.id_terreno = TERRENO.id_terreno 
+    )
+;
 
 
 
