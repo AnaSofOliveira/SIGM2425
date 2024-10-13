@@ -1,5 +1,5 @@
 --#############
---# Paulo Trigo
+--# GRUPO 04
 --#############
 
 
@@ -20,11 +20,22 @@
 --------------------------------
 -- Criar o Esquema Relacional
 --------------------------------
--- DROP VIEW IF EXISTS V_
+
+ALTER TABLE terreno DROP CONSTRAINT fk1;
+ALTER TABLE gps_ponto DROP CONSTRAINT fk1;
+
+
+DROP TABLE IF EXISTS t_ponto_fronteira;
+DROP VIEW IF EXISTS v_poligono;
+DROP VIEW IF EXISTS v_linha_extremo_coincidente;
+DROP TABLE IF EXISTS taux_linha_contorno;
+DROP VIEW IF EXISTS v_linha_contorno;
+DROP VIEW IF EXISTS v_pontos_ordenados;
 
 DROP TABLE IF EXISTS gps_ponto;
 DROP TABLE IF EXISTS terreno;
 DROP TABLE IF EXISTS tipo_terreno;
+
 ---------------------------------
 
 
@@ -33,7 +44,7 @@ DROP TABLE IF EXISTS tipo_terreno;
 -- TIPO_TERRENO
 ---------------------------------
 CREATE TABLE tipo_terreno (
-    ID_TIPO_TERRENO VARCHAR PRIMARY KEY
+    id_tipo_terreno VARCHAR PRIMARY KEY
 );
 
 
@@ -42,22 +53,22 @@ CREATE TABLE tipo_terreno (
 -- TERRENO
 ---------------------------------
 CREATE TABLE terreno (
-    ID_TERRENO INTEGER PRIMARY KEY, 
-    ID_TIPO_TERRENO VARCHAR, 
-    CONSTRAINT FK1 FOREIGN KEY(ID_TIPO_TERRENO) REFERENCES tipo_terreno(ID_TIPO_TERRENO) 
+    id_terreno INTEGER PRIMARY KEY, 
+    id_tipo_terreno VARCHAR, 
+    CONSTRAINT fk1 FOREIGN KEY(id_tipo_terreno) REFERENCES tipo_terreno(id_tipo_terreno) 
 );
 
-SELECT AddGeometryColumn('public', 'terreno', 'G_TERRENO', 0, 'POLYGON', 2);
+SELECT AddGeometryColumn('public', 'terreno', 'g_terreno', 0, 'POLYGON', 2);
 
 ---------------------------------
 -- GPS_PONTO
 ---------------------------------
 CREATE TABLE gps_ponto (
-    ID_ORDEM INTEGER,
-    ID_TERRENO INTEGER, 
-    CONSTRAINT PK_GPS_PONTO PRIMARY KEY(ID_ORDEM, ID_TERRENO), 
-    CONSTRAINT FK1 FOREIGN KEY(ID_TERRENO) REFERENCES TERRENO(ID_TERRENO)
+    id_ordem INTEGER,
+    id_terreno INTEGER, 
+    CONSTRAINT pk_gps_ponto PRIMARY KEY(id_ordem, id_terreno), 
+    CONSTRAINT fk1 FOREIGN KEY(id_terreno) REFERENCES terreno(id_terreno)
 );
 
-SELECT AddGeometryColumn('public', 'gps_ponto', 'G_PONTO', 0, 'POINT', 2);
+SELECT AddGeometryColumn('public', 'gps_ponto', 'g_ponto', 0, 'POINT', 2);
 
