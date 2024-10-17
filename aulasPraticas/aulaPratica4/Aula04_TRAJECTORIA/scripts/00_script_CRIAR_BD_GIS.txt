@@ -1,5 +1,5 @@
 --#############
---# Paulo Trigo
+--# GRUPO 04
 --#############
 
 
@@ -19,7 +19,7 @@
 \set userName postgres
 \set hostName localhost
 \set portNumber 5432
-
+\set extension postgis;
 
 
 -------------
@@ -37,7 +37,7 @@
 \echo
 \echo "Remover Base de Dados" :dataBase
 ;
--- DROP DATABASE IF EXISTS <completar>
+DROP DATABASE IF EXISTS :dataBase
 ;
 
 
@@ -49,21 +49,21 @@
 \echo
 \echo "Criar Base de Dados" :dataBase
 ;
--- CREATE DATABASE :dataBase
+CREATE DATABASE :dataBase
 ;
 
 
 \echo
 \echo "Estabelecer Conexao com a Base de Dados" :dataBase
 ;
--- \c :dataBase :userName :hostName :portNumber
+\c :dataBase :userName :hostName :portNumber
 ;
 
 
 \echo
-\echo "Aplicar o Extensor "postgis" à Base de Dados" :dataBase
+\echo "Aplicar o Extensor "postgis" ï¿½ Base de Dados" :dataBase
 ;
--- CREATE <completar>
+CREATE EXTENSION :extension
 ;
 
 
@@ -73,7 +73,7 @@
 -- \ Start \ All Programs \ PostgresSQL 9.6 \ Installation Notes \ Procedural Languagess
 
 -- \echo
--- \echo "Aplicar o Extensor "python3" à Base de Dados" :dataBase
+-- \echo "Aplicar o Extensor "python3" ï¿½ Base de Dados" :dataBase
 -- ;
 -- CREATE EXTENSION plpython3u
 -- ;
