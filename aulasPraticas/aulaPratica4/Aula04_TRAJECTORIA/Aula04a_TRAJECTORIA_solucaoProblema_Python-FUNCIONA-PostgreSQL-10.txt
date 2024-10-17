@@ -1,0 +1,28 @@
+
+
+:: PASSO 1 (copiar .dll para system32)
+https://cotrimpira.blogspot.com/2019/10/habilitar-o-python-no-postgresql.html
+
+>> copiar a dll C:\Python\Python37\python37.dll para C:\Windows\System32\python33.dll
+>> (nome modificado de python37 para python33, tem que fazer isso)
+
+
+:: PASSO 2 (alterar variáveis de ambiente)
+https://stackoverflow.com/questions/59202641/when-creating-plpython3u-function-connection-to-the-server-has-been-lost
+
+$ set PYTHONHOME=C:\edb\languagepack\v1\Python-3.7
+$ set PATH=C:\edb\languagepack\v1\Python-3.7; C:\edb\languagepack\v1\Perl-5.26\bin; C:\edb\languagepack\v1\Tcl-8.6\bin;%PATH%
+
+
+:: PASSO 3 (reiniciar servidor PostgreSQL)
+https://tableplus.com/blog/2018/10/how-to-start-stop-restart-postgresql-server.html
+
+:: STOP
+$ pg_ctl -D "C:\Program Files\PostgreSQL\9.6\data" stop
+ 
+:: START
+$ pg_ctl -D "C:\Program Files\PostgreSQL\9.6\data" start
+
+:: RESTART
+$ pg_ctl -D "C:\Program Files\PostgreSQL\9.6\data" restart
+
