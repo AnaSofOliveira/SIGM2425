@@ -27,7 +27,10 @@ DROP TABLE IF EXISTS cinematica CASCADE;
 ----------------------------------------------------
 
 CREATE TABLE cinematica(
--- <COMPLETAR>
+    id integer PRIMARY KEY, 
+    orientacao real, 
+    velocidade t_velocidade, 
+    aceleracao t_aceleracao
 );
 SELECT AddGeometryColumn( '', 'cinematica', 'g_posicao', 3763, 'POINT', 2 );
 
@@ -35,8 +38,11 @@ SELECT AddGeometryColumn( '', 'cinematica', 'g_posicao', 3763, 'POINT', 2 );
 
 -- Regista trajectos (i.e., historico da cinematica)
 CREATE TABLE cinematica_hist(
-id_hist SERIAL PRIMARY KEY,
--- <COMPLETAR>
+    id_hist SERIAL PRIMARY KEY,
+    id integer, 
+    orientacao real, 
+    velocidade t_velocidade, 
+    aceleracao t_aceleracao
 );
 SELECT AddGeometryColumn( '', 'cinematica_hist', 'g_posicao', 3763, 'POINT', 2 );
 
@@ -67,6 +73,7 @@ ROW( ROW( 1, 1 ), 0.3 ),
 ROW( ROW( 2, 0.5 ), 1.0 )
 );
 
+\echo -> Dados na tabela cinematica:
 SELECT *
 FROM cinematica;
 
@@ -80,6 +87,7 @@ INSERT INTO cinematica_hist
 SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
 FROM cinematica;
 
+\echo -> Dados na tabela cinematica_hist:
 SELECT *
 FROM cinematica_hist;
 

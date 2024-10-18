@@ -39,14 +39,15 @@ RETURNS geometry
 AS $$
 SELECT 
 ST_Translate( $1,
-              (($2).linear * $3 ).x,
-              (($2).linear * $3 ).y )
+              (($2).c_linear * $3 ).x,
+              (($2).c_linear * $3 ).y )
 $$ LANGUAGE 'sql';
 
 
 -- TESTE
 -- tempo=2
 --________
+\echo -> Testes funcao novo_posicao:
 SELECT ST_Astext( novo_posicao( g_posicao, velocidade, 2 ) )
 FROM cinematica;
 -- resultado:
@@ -63,14 +64,25 @@ FROM cinematica;
 CREATE OR REPLACE FUNCTION novo_orientacao( orientacao real, velocidade t_velocidade, tempo real )
 RETURNS real
 AS $$
-return -- <COMPLETAR>
+return orientacao + velocidade.c_angular * tempo 
 $$ LANGUAGE plpython3u;
+
+
+CREATE OR REPLACE FUNCTION novo_orientacao_PLPGSQL( orientacao real, velocidade t_velocidade, tempo real )
+RETURNS real
+AS $$
+BEGIN
+    RETURN orientacao + velocidade.c_angular * tempo;
+END;
+$$ LANGUAGE plpgsql;
+
 
 
 -- TESTE
 -- tempo=2
 --________
-SELECT novo_orientacao( orientacao, velocidade, 2 )
+\echo -> Testes funcao novo_orientacao_PLPGSQL:
+SELECT novo_orientacao_PLPGSQL( orientacao, velocidade, 2 )
 FROM cinematica;
 -- resultado:
 -- 2.6

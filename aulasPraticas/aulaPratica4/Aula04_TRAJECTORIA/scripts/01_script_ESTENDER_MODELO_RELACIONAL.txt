@@ -212,13 +212,16 @@ SELECT (3, 4) + (3.5, 4.9) * 5 AS v1, ( cast( (3, 4) AS t_vector ) + cast( (3.5,
 --__________________
 -- normalizar: dividir cada componente pela norma
 -- norma: raiz duadrada da soma dos quadrados de cada componente (x**2 e' x ao quadrado)
-CREATE OR REPLACE FUNCTION normalizar( vec t_vector )
-RETURNS t_vector
-AS $$
-from math import sqrt
-
+-- CREATE OR REPLACE FUNCTION normalizar( vec t_vector )
+-- RETURNS t_vector
+-- AS $$
+-- from math import sqrt
+-- norm = sqrt(vec[ "x" ]**2 + vec[ "y" ]**2)
+-- new_x = vec["x"]/norm
+-- new_y = vec["y"]/norm
+-- return {"x": new_x, "y": new_y }
 -- <COMPLETAR>
-$$ LANGUAGE plpython3u;
+-- $$ LANGUAGE plpython3u;
 
 
 
@@ -235,7 +238,9 @@ DECLARE
     new_x real;
     new_y real;
 BEGIN
--- <COMPLETAR>
+    norma := sqrt(power(vec.x, 2) + power(vec.y, 2));
+	new_x := vec.x / norma;
+	new_y := vec.y / norma;
     RETURN (new_x, new_y);
 END;
 $$ LANGUAGE plpgsql;
@@ -244,11 +249,12 @@ $$ LANGUAGE plpgsql;
 
 -- TESTE
 --______
-SELECT normalizar( (3, 4) ) AS v;
+\echo -> Testes a normalizacao de um vetor:
+SELECT normalizar_PLPGSQL( (3, 4) ) AS v;
 -- resultado: v = (0.6, 0.8)
 
-SELECT normalizar( (3, 4) + (3.5, 4.9) * 5 ) AS v1,
-       normalizar( ( (3, 4)::t_vector + (3.5, 4.9)::t_vector ) * 5 ) AS v2;
+SELECT normalizar_PLPGSQL( (3, 4) + (3.5, 4.9) * 5 ) AS v1,
+       normalizar_PLPGSQL( ( (3, 4)::t_vector + (3.5, 4.9)::t_vector ) * 5 ) AS v2;
 -- resultado: v1 = (0.5832929, 0.811894); v2 = (0.589789, 0.807557)
 --=================================================================================
 
