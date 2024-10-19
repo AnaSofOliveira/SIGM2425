@@ -1,5 +1,5 @@
 --#############
---# GRUPO 04
+--# Grupo 04
 --#############
 
 
@@ -41,6 +41,7 @@ CREATE TYPE t_vector AS (
 
 -- TESTE
 --______
+\echo -> Testes ao tipo t_vetor:
 SELECT cast( (3, 4) AS t_vector ) AS v;
 SELECT (3, 4)::t_vector AS v;
 
@@ -56,6 +57,7 @@ CREATE TYPE t_velocidade AS (
 
 -- TESTE
 --______
+\echo -> Testes ao tipo t_velocidade:
 SELECT cast( ( cast( (3, 4) AS t_vector ), 10.09 ) AS t_velocidade ) AS v;
 SELECT ( (3, 4)::t_vector, 10.09 )::t_velocidade AS v;
 
@@ -68,6 +70,7 @@ CREATE TYPE t_aceleracao AS (
 
 -- TESTE
 --______
+\echo -> Testes ao tipo t_aceleracao:
 SELECT cast( ( cast( (3, 4) AS t_vector ), 10.09 ) AS t_aceleracao ) AS v;
 SELECT ( (3, 4)::t_vector, 10.09 )::t_aceleracao AS v;
 
@@ -88,13 +91,13 @@ SELECT ( (3, 4)::t_vector, 10.09 )::t_aceleracao AS v;
 --____________________________________
 -- Produto de um vector por um escalar
 --____________________________________
-CREATE OR REPLACE FUNCTION produto_vector_por_escalar( vec t_vector, v real )
-RETURNS t_vector
-AS $$
-new_x = vec[ "x" ] * float( v )
-new_y = vec[ "y" ] * float( v )
-return { "x": new_x, "y": new_y }
-$$ LANGUAGE plpython3u;
+-- CREATE OR REPLACE FUNCTION produto_vector_por_escalar( vec t_vector, v real )
+-- RETURNS t_vector
+-- AS $$
+-- new_x = vec[ "x" ] * float( v )
+-- new_y = vec[ "y" ] * float( v )
+-- return { "x": new_x, "y": new_y }
+-- $$ LANGUAGE plpython3u;
 
 
 
@@ -120,13 +123,13 @@ $$ LANGUAGE plpgsql;
 -- Caso n�o consiga usar as fun��es em Python
 -- ent�o pode implementar usando o "SQL"
 ---------------------------------------------------
-CREATE OR REPLACE FUNCTION produto_vector_por_escalar_SQL( vec t_vector, v real )
-RETURNS t_vector
-AS $$
-    SELECT ( ($1).x * $2, ($1).y * $2 )::t_vector;
-   -- Ou, escrevendo o CAST de outro modo,
-   -- SELECT CAST( ( ($1).x * $2, ($1).y * $2 ) AS t_vector );
-$$ LANGUAGE 'sql';
+-- CREATE OR REPLACE FUNCTION produto_vector_por_escalar_SQL( vec t_vector, v real )
+-- RETURNS t_vector
+-- AS $$
+--    SELECT ( ($1).x * $2, ($1).y * $2 )::t_vector;
+--    -- Ou, escrevendo o CAST de outro modo,
+--    -- SELECT CAST( ( ($1).x * $2, ($1).y * $2 ) AS t_vector );
+-- $$ LANGUAGE 'sql';
 
 
 
@@ -135,15 +138,16 @@ $$ LANGUAGE 'sql';
 -- Defini��o do Operador
 ---------------------------------------------------
 CREATE OPERATOR * (
-    leftarg = t_vector,
-    rightarg = real,
-    procedure = produto_vector_por_escalar,
-    commutator = *
+leftarg = t_vector,
+rightarg = real,
+procedure = produto_vector_por_escalar_PLGSQL,
+commutator = *
 );
 
 
 -- TESTE
 --______
+\echo -> Testes ao produto de vetor por escalar:
 SELECT (3, 4) * 5 AS v;
 --resultado: v = (15, 20)
 
@@ -156,14 +160,13 @@ SELECT (3, 4) * 5 AS v1, (3.5, 4.9) * 5.1 AS v2;
 --______________________
 -- Soma de dois vectores
 --______________________
-CREATE OR REPLACE FUNCTION soma_vector_vector( vec_a t_vector, vec_b t_vector )
-RETURNS t_vector
-AS $$
-    new_x = round(vec_a[ "x" ] + vec_b[ "x" ], 1)
-    new_y = round(vec_a[ "y" ] + vec_b[ "y" ], 1)
-    return { "x": new_x, "y": new_y }
-$$ LANGUAGE plpython3u;
-
+-- CREATE OR REPLACE FUNCTION soma_vector_vector( vec_a t_vector, vec_b t_vector )
+-- RETURNS t_vector
+-- AS $$
+-- new_x = vec_a[ "x" ] + vec_b[ "x" ]
+-- new_y = vec_a[ "y" ] + vec_b[ "y" ]
+-- return {"x": new_x, "y": new_y}
+-- $$ LANGUAGE plpython3u;
 
 
 ---------------------------------------------------
@@ -183,20 +186,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
-
 ---------------------------------------------------
 -- Defini��o do Operador
 ---------------------------------------------------
 CREATE OPERATOR + (
     leftarg = t_vector,
     rightarg = t_vector,
-    procedure = soma_vector_vector
+    procedure = soma_vector_vector_PLPGSQL,
+    commutator = +
 );
 
 
 -- TESTE
 --______
+\echo -> Testes a soma de dois vetores:
 SELECT cast( (3, 4) AS t_vector ) + cast( (3.5, 4.9) AS t_vector ) AS v;
 -- resultado: v = (6.5, 8.9)
 
@@ -235,9 +238,9 @@ DECLARE
     new_x real;
     new_y real;
 BEGIN
-    norma := sqrt(vec.x^2 + vec.y^2);
-    new_x := vec.x / norma;
-    new_y := vec.y / norma;
+    norma := sqrt(power(vec.x, 2) + power(vec.y, 2));
+	new_x := vec.x / norma;
+	new_y := vec.y / norma;
     RETURN (new_x, new_y);
 END;
 $$ LANGUAGE plpgsql;
@@ -246,11 +249,12 @@ $$ LANGUAGE plpgsql;
 
 -- TESTE
 --______
-SELECT normalizar( (3, 4) ) AS v;
+\echo -> Testes a normalizacao de um vetor:
+SELECT normalizar_PLPGSQL( (3, 4) ) AS v;
 -- resultado: v = (0.6, 0.8)
 
-SELECT normalizar( (3, 4) + (3.5, 4.9) * 5 ) AS v1,
-       normalizar( ( (3, 4)::t_vector + (3.5, 4.9)::t_vector ) * 5 ) AS v2;
+SELECT normalizar_PLPGSQL( (3, 4) + (3.5, 4.9) * 5 ) AS v1,
+       normalizar_PLPGSQL( ( (3, 4)::t_vector + (3.5, 4.9)::t_vector ) * 5 ) AS v2;
 -- resultado: v1 = (0.5832929, 0.811894); v2 = (0.589789, 0.807557)
 --=================================================================================
 
