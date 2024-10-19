@@ -1,5 +1,5 @@
 --#############
---# Paulo Trigo
+--# GRUPO 04
 --#############
 
 
@@ -19,7 +19,7 @@
 \set userName postgres
 \set hostName localhost
 \set portNumber 5432
-
+\set extension postgis;
 
 
 -------------

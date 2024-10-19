@@ -35,8 +35,8 @@ DROP TYPE IF EXISTS t_vector;
 ----------------------------------------------------
 
 CREATE TYPE t_vector AS (
-    x real, 
-    y real
+    x REAL, 
+    y REAL
 );
 
 -- TESTE
@@ -52,7 +52,7 @@ SELECT (3.33, 4.44)::t_vector AS v;
 
 CREATE TYPE t_velocidade AS (
     linear t_vector, 
-    angular real
+    angular REAL
 );
 
 -- TESTE
@@ -65,7 +65,7 @@ SELECT ( (3, 4)::t_vector, 10.09 )::t_velocidade AS v;
 
 CREATE TYPE t_aceleracao AS (
     linear t_vector, 
-    angular real
+    angular REAL
 );
 
 -- TESTE
@@ -149,10 +149,10 @@ commutator = *
 --______
 \echo -> Testes ao produto de vetor por escalar:
 SELECT (3, 4) * 5 AS v;
--- resultado: v = (15, 20)
+--resultado: v = (15, 20)
 
 SELECT (3, 4) * 5 AS v1, (3.5, 4.9) * 5.1 AS v2;
--- resultado: v1 = (15, 20); v2 = (17.85, 24.99)
+--resultado: v1 = (15, 20); v2 = (17.85, 24.99)
 
 
 
@@ -167,6 +167,7 @@ SELECT (3, 4) * 5 AS v1, (3.5, 4.9) * 5.1 AS v2;
 -- new_y = vec_a[ "y" ] + vec_b[ "y" ]
 -- return {"x": new_x, "y": new_y}
 -- $$ LANGUAGE plpython3u;
+
 
 ---------------------------------------------------
 -- Caso n�o consiga usar as fun��es em Python
@@ -212,16 +213,15 @@ SELECT (3, 4) + (3.5, 4.9) * 5 AS v1, ( cast( (3, 4) AS t_vector ) + cast( (3.5,
 --__________________
 -- normalizar: dividir cada componente pela norma
 -- norma: raiz duadrada da soma dos quadrados de cada componente (x**2 e' x ao quadrado)
--- CREATE OR REPLACE FUNCTION normalizar( vec t_vector )
--- RETURNS t_vector
--- AS $$
--- from math import sqrt
--- norm = sqrt(vec[ "x" ]**2 + vec[ "y" ]**2)
--- new_x = vec["x"]/norm
--- new_y = vec["y"]/norm
--- return {"x": new_x, "y": new_y }
--- <COMPLETAR>
--- $$ LANGUAGE plpython3u;
+CREATE OR REPLACE FUNCTION normalizar( vec t_vector )
+RETURNS t_vector
+AS $$
+    from math import sqrt
+    norm = sqrt(vec["x"]**2 + vec["y"]**2)
+    new_x = vec["x"] / norm
+    new_y = vec["y"] / norm
+    return { "x": new_x, "y": new_y }
+$$ LANGUAGE plpython3u;
 
 
 

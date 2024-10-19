@@ -136,22 +136,11 @@ FROM cinematica;
 --------------------------------------------------------------
 CREATE VIEW v_novo_cinematica AS
 SELECT c.id AS id,
-        2 as tempo,
-        novo_orientacao_PLPGSQL( c.orientacao, c.velocidade, 2 ) AS orientacao,
-        novo_velocidade_PLPGSQL( c.velocidade, c.aceleracao, 2 ) AS velocidade,
-        c.aceleracao,
-        ST_AsText( novo_posicao( c.g_posicao, c.velocidade, 2 ) ) AS posicao_texto,
-        novo_posicao( c.g_posicao, c.velocidade, 2 ) AS posicao
-FROM cinematica c
-UNION
-SELECT c.id AS id,
-        3 as tempo,
-        novo_orientacao_PLPGSQL( c.orientacao, c.velocidade, 3 ) AS orientacao,
-        novo_velocidade_PLPGSQL( c.velocidade, c.aceleracao, 3 ) AS velocidade,
-        c.aceleracao,
-        ST_AsText( novo_posicao( c.g_posicao, c.velocidade, 3 ) ) AS posicao_texto,
-        novo_posicao( c.g_posicao, c.velocidade, 3 ) AS posicao
-
+       novo_orientacao( c.orientacao, c.velocidade, 2 ) AS orientacao,
+       novo_velocidade( c.velocidade, c.aceleracao, 2 ) AS velocidade,
+       c.aceleracao,
+       ST_AsText( novo_posicao( c.g_posicao, c.velocidade, 2 ) ) AS posicao_texto,
+       novo_posicao( c.g_posicao, c.velocidade, 2 ) AS posicao
 FROM cinematica c;
 
 \echo -> View cinematica:

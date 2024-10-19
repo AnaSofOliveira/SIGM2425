@@ -65,7 +65,6 @@ ROW( ROW( 2, 0.5 ), 1.0 )
 
 -- UPDATE cinematica
 -- SET orientacao = novo_orientacao_PLPGSQL( orientacao, velocidade, 1 );
-
 --________________________________________________________________________________________________
 
 DO
