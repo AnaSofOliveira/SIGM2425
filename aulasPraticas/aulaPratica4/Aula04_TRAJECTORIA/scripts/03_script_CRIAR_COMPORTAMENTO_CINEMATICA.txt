@@ -63,7 +63,7 @@ FROM cinematica;
 CREATE OR REPLACE FUNCTION novo_orientacao( orientacao real, velocidade t_velocidade, tempo real )
 RETURNS real
 AS $$
-return -- <COMPLETAR>
+return orientacao + velocidade['angular'] * tempo
 $$ LANGUAGE plpython3u;
 
 
@@ -87,7 +87,9 @@ FROM cinematica;
 CREATE OR REPLACE FUNCTION novo_velocidade( velocidade t_velocidade, aceleracao t_aceleracao, tempo real )
 RETURNS t_velocidade
 AS $$
--- <COMPLETAR>
+    SELECT 
+        (velocidade.linear + aceleracao.linear * tempo) AS linear,
+        (velocidade.angular + aceleracao.angular * tempo) AS angular
 $$ LANGUAGE 'sql';
 
 
@@ -113,7 +115,7 @@ SELECT c.id AS id,
        novo_orientacao( c.orientacao, c.velocidade, 2 ) AS orientacao,
        novo_velocidade( c.velocidade, c.aceleracao, 2 ) AS velocidade,
        c.aceleracao,
-       AsText( novo_posicao( c.g_posicao, c.velocidade, 2 ) ) AS posicao_texto,
+       ST_AsText( novo_posicao( c.g_posicao, c.velocidade, 2 ) ) AS posicao_texto,
        novo_posicao( c.g_posicao, c.velocidade, 2 ) AS posicao
 FROM cinematica c;
 

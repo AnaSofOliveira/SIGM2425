@@ -1,5 +1,5 @@
 --#############
---# Paulo Trigo
+--# GRUPO 04
 --#############
 
 
@@ -52,20 +52,30 @@ ROW( ROW( 2, 0.5 ), 1.0 )
 -- [2] Executar as linhas (A) e (B) em ciclo
 --------------------------------------------
 --------------------------------------------
--- (A)
-INSERT INTO cinematica_hist
-SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
-FROM cinematica;
+DO $$
+DECLARE
+    i INTEGER := 1;
+    max_iterations INTEGER := 25;
+BEGIN
+    WHILE i <= max_iterations LOOP
+        -- (A)
+        INSERT INTO cinematica_hist
+        SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
+        FROM cinematica;
 
--- (B)
-UPDATE cinematica
-SET velocidade = novo_velocidade( velocidade, aceleracao, 1 );
+        -- (B)
+        UPDATE cinematica
+        SET velocidade = novo_velocidade( velocidade, aceleracao, 1 );
 
-UPDATE cinematica
-SET g_posicao = novo_posicao( g_posicao, velocidade, 1 );
+        UPDATE cinematica
+        SET g_posicao = novo_posicao( g_posicao, velocidade, 1 );
 
-UPDATE cinematica
-SET orientacao = novo_orientacao( orientacao, velocidade, 1 );
+        UPDATE cinematica
+        SET orientacao = novo_orientacao( orientacao, velocidade, 1 );
+
+        i := i + 1;
+    END LOOP;
+END $$;
 --________________________________________________________________________________________________
 
 

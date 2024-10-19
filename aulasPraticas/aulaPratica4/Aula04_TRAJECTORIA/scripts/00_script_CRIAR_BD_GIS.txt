@@ -72,9 +72,9 @@ CREATE EXTENSION :extension
 -- a mesma que a da sua instalcao do PostgreSQL. Para ver qual a versao Python que necessita veja:
 -- \ Start \ All Programs \ PostgresSQL 9.6 \ Installation Notes \ Procedural Languagess
 
--- \echo
--- \echo "Aplicar o Extensor "python3" � Base de Dados" :dataBase
--- ;
--- CREATE EXTENSION plpython3u
--- ;
+\echo
+\echo "Aplicar o Extensor "python3" � Base de Dados" :dataBase
+;
+CREATE EXTENSION plpython3u
+;
 
