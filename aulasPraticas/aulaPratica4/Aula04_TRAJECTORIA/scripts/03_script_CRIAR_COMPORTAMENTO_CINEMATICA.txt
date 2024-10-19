@@ -39,8 +39,8 @@ RETURNS geometry
 AS $$
 SELECT 
 ST_Translate( $1,
-              (($2).c_linear * $3 ).x,
-              (($2).c_linear * $3 ).y )
+              (($2).linear * $3 ).x,
+              (($2).linear * $3 ).y )
 $$ LANGUAGE 'sql';
 
 
@@ -64,7 +64,7 @@ FROM cinematica;
 CREATE OR REPLACE FUNCTION novo_orientacao( orientacao real, velocidade t_velocidade, tempo real )
 RETURNS real
 AS $$
-return orientacao + velocidade.c_angular * tempo 
+return orientacao + velocidade.angular * tempo 
 $$ LANGUAGE plpython3u;
 
 
@@ -72,7 +72,7 @@ CREATE OR REPLACE FUNCTION novo_orientacao_PLPGSQL( orientacao real, velocidade 
 RETURNS real
 AS $$
 BEGIN
-    RETURN orientacao + velocidade.c_angular * tempo;
+    RETURN orientacao + velocidade.angular * tempo;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -96,17 +96,32 @@ FROM cinematica;
 -- velocidade.linear + aceleracao.linear * tempo
 -- velocidade.angular + aceleracao.angular * tempo
 --_______________________________________________________
-CREATE OR REPLACE FUNCTION novo_velocidade( velocidade t_velocidade, aceleracao t_aceleracao, tempo real )
+-- CREATE OR REPLACE FUNCTION novo_velocidade( velocidade t_velocidade, aceleracao t_aceleracao, tempo real )
+-- RETURNS t_velocidade
+-- AS $$
+-- <COMPLETAR>
+-- $$ LANGUAGE 'sql';
+
+
+
+CREATE OR REPLACE FUNCTION novo_velocidade_PLPGSQL( velocidade t_velocidade, aceleracao t_aceleracao, tempo real )
 RETURNS t_velocidade
 AS $$
--- <COMPLETAR>
-$$ LANGUAGE 'sql';
+DECLARE
+    vel t_velocidade;
+BEGIN
+    vel.linear := velocidade.linear + aceleracao.linear * tempo;
+    vel.angular := velocidade.angular + aceleracao.angular * tempo;
+    RETURN (vel);
+END;
+$$ LANGUAGE plpgsql;
 
 
 -- TESTE
 -- tempo=2
 --________
-SELECT novo_velocidade( velocidade, aceleracao, 2 )
+\echo -> Testes funcao novo_velocidade_PLPGSQL:
+SELECT novo_velocidade_PLPGSQL( velocidade, aceleracao, 2 )
 FROM cinematica;
 -- resultado:
 -- ("(2, 7)", 3.3)
@@ -119,16 +134,27 @@ FROM cinematica;
 -- Vista da 'cinematica' para um instante do tempo (e.g., 2)
 --------------------------------------------------------------
 --------------------------------------------------------------
-DROP VIEW IF EXISTS v_novo_cinematica;
 CREATE VIEW v_novo_cinematica AS
 SELECT c.id AS id,
-       novo_orientacao( c.orientacao, c.velocidade, 2 ) AS orientacao,
-       novo_velocidade( c.velocidade, c.aceleracao, 2 ) AS velocidade,
-       c.aceleracao,
-       AsText( novo_posicao( c.g_posicao, c.velocidade, 2 ) ) AS posicao_texto,
-       novo_posicao( c.g_posicao, c.velocidade, 2 ) AS posicao
+        2 as tempo,
+        novo_orientacao_PLPGSQL( c.orientacao, c.velocidade, 2 ) AS orientacao,
+        novo_velocidade_PLPGSQL( c.velocidade, c.aceleracao, 2 ) AS velocidade,
+        c.aceleracao,
+        ST_AsText( novo_posicao( c.g_posicao, c.velocidade, 2 ) ) AS posicao_texto,
+        novo_posicao( c.g_posicao, c.velocidade, 2 ) AS posicao
+FROM cinematica c
+UNION
+SELECT c.id AS id,
+        3 as tempo,
+        novo_orientacao_PLPGSQL( c.orientacao, c.velocidade, 3 ) AS orientacao,
+        novo_velocidade_PLPGSQL( c.velocidade, c.aceleracao, 3 ) AS velocidade,
+        c.aceleracao,
+        ST_AsText( novo_posicao( c.g_posicao, c.velocidade, 3 ) ) AS posicao_texto,
+        novo_posicao( c.g_posicao, c.velocidade, 3 ) AS posicao
+
 FROM cinematica c;
 
+\echo -> View cinematica:
 SELECT * FROM v_novo_cinematica;
 -- resolucao: confrontar com os dados obtidos isoladamente por cada funcao (acima)
 --=================================================================================

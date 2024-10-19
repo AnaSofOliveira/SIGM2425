@@ -51,8 +51,8 @@ SELECT (3.33, 4.44)::t_vector AS v;
 ----------------------------------------------------
 
 CREATE TYPE t_velocidade AS (
-    c_linear t_vector, 
-    c_angular real
+    linear t_vector, 
+    angular real
 );
 
 -- TESTE
@@ -64,8 +64,8 @@ SELECT ( (3, 4)::t_vector, 10.09 )::t_velocidade AS v;
 ----------------------------------------------------
 
 CREATE TYPE t_aceleracao AS (
-    c_linear t_vector, 
-    c_angular real
+    linear t_vector, 
+    angular real
 );
 
 -- TESTE

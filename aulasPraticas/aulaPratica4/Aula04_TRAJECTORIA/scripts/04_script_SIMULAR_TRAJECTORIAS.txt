@@ -45,7 +45,6 @@ ROW( ROW( 2, 0.5 ), 1.0 )
 );
 
 
-
 --------------------------------------------
 --------------------------------------------
 -- Simulacao de trajectorias:
@@ -53,21 +52,49 @@ ROW( ROW( 2, 0.5 ), 1.0 )
 --------------------------------------------
 --------------------------------------------
 -- (A)
-INSERT INTO cinematica_hist
-SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
-FROM cinematica;
+-- INSERT INTO cinematica_hist
+-- SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
+-- FROM cinematica;
 
 -- (B)
-UPDATE cinematica
-SET velocidade = novo_velocidade( velocidade, aceleracao, 1 );
+-- UPDATE cinematica
+-- SET velocidade = novo_velocidade_PLPGSQL( velocidade, aceleracao, 1 );
 
-UPDATE cinematica
-SET g_posicao = novo_posicao( g_posicao, velocidade, 1 );
+-- UPDATE cinematica
+-- SET g_posicao = novo_posicao( g_posicao, velocidade, 1 );
 
-UPDATE cinematica
-SET orientacao = novo_orientacao( orientacao, velocidade, 1 );
+-- UPDATE cinematica
+-- SET orientacao = novo_orientacao_PLPGSQL( orientacao, velocidade, 1 );
+
 --________________________________________________________________________________________________
 
+DO
+$$
+DECLARE
+    nIteracoes INT := 10;  -- Número de iterações
+    count INT := 0;
+BEGIN
+    WHILE count < nIteracoes LOOP
+        -- (A) Inserir o estado atual na tabela histórica
+        INSERT INTO cinematica_hist
+        SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade, aceleracao, g_posicao
+        FROM cinematica;
+
+        -- (B) Atualizar a velocidade, posição e orientação
+        UPDATE cinematica
+        SET velocidade = novo_velocidade_PLPGSQL(velocidade, aceleracao, 1);
+
+        UPDATE cinematica
+        SET g_posicao = novo_posicao(g_posicao, velocidade, 1);
+
+        UPDATE cinematica
+        SET orientacao = novo_orientacao_PLPGSQL(orientacao, velocidade, 1);
+
+        -- Incrementar o count
+        count := count + 1;
+    END LOOP;
+END
+$$;
 
 
 
