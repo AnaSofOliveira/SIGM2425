@@ -1,10 +1,10 @@
 --#############
---# Paulo Trigo
+--# Grupo 04
 --#############
 
 
 --=============
--- Ligação à BD
+-- Ligaï¿½ï¿½o ï¿½ BD
 --=============
 \set dataBase my_gis_aug_real
 ;
@@ -38,9 +38,10 @@ CREATE OR REPLACE FUNCTION novo_aceleracao_linear( g_posicao_perseguidor geometr
                                                    velocidade_a_perseguir real )
 RETURNS t_vector
 AS $$
--- <COMPLETAR>
+    SELECT
+        normalizar_PLPGSQL(g_posicao_alvo - g_posicao_perseguidor) * velocidade_a_perseguir AS v
+    ;    
 $$ LANGUAGE 'sql';
-
 
 -- TESTE
 -- velocidade_a_perseguir=2
@@ -59,7 +60,7 @@ WHERE c_origem.id = 1 and c_destino.id = 2;
 --______________________________________________________________________________________________
 CREATE OR REPLACE FUNCTION obter_aceleracao_perseguidor( id_perseguidor int,
                                                          id_alvo int,
-                                                         velocidade_a_perseguir real )
+                                                        velocidade_a_perseguir real )
 RETURNS t_aceleracao
 AS $$
 SELECT novo_aceleracao_linear( c_perseguidor.g_posicao, c_alvo.g_posicao, $3 ), (c_perseguidor.aceleracao).angular
