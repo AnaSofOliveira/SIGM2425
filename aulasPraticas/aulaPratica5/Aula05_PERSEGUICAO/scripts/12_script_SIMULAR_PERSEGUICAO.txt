@@ -1,10 +1,10 @@
 --#############
---# Paulo Trigo
+--# Grupo 04
 --#############
 
 
 --=============
--- Ligação à BD
+-- Ligaï¿½ï¿½o ï¿½ BD
 --=============
 \set dataBase my_gis_aug_real
 ;
@@ -24,14 +24,14 @@
 ----------------------------
 ----------------------------
 -- no caso de ja ter construido objecto_movel sera' preciso fazer:
--- DELETE FROM objecto_movel;
+DELETE FROM objecto_movel;
 DELETE FROM pp;
 DELETE FROM cinematica_hist;
 DELETE FROM cinematica;
 
 --_________________________________________________________________________________________
 -- Inserir dados para caracterizacao da cinematica
--- ATENCAO: o velocidade esta normalizada portanto a aceleraao também deve estar em [-1, 1]
+-- ATENCAO: o velocidade esta normalizada portanto a aceleraao tambï¿½m deve estar em [-1, 1]
 --_________________________________________________________________________________________
 INSERT INTO cinematica( id, g_posicao, orientacao, velocidade, aceleracao ) VALUES(
 1,
@@ -65,35 +65,75 @@ VALUES( 1, 2 );
 --  com velocidade-de-perseguicao=0.2)
 --------------------------------------------
 --------------------------------------------
--- (A)
-INSERT INTO cinematica_hist
-SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
-FROM cinematica;
 
--- (B)
-UPDATE cinematica
-SET aceleracao = obter_aceleracao_perseguidor( pp.id_perseguidor, pp.id_alvo, 0.2 )
-FROM pp
-WHERE id = pp.id_perseguidor;;
+DO
+$$
+DECLARE
+    nIteracoes INT := 115;  -- NÃºmero de iteraÃ§Ãµes
+    count INT := 0;
+BEGIN
+    WHILE count < nIteracoes LOOP
+        -- (A)
+        INSERT INTO cinematica_hist
+        SELECT nextval('cinematica_hist_id_hist_seq'), id, orientacao, velocidade , aceleracao, g_posicao
+        FROM cinematica;
 
-UPDATE cinematica
-SET velocidade = novo_velocidade( velocidade, aceleracao, 1 )
-FROM pp
-WHERE id = pp.id_perseguidor;
+        -- (B)
+        UPDATE cinematica
+        SET aceleracao = obter_aceleracao_perseguidor( pp.id_perseguidor, pp.id_alvo, 0.2 ) -- c) Altere o script de modo a que a velocidade da perseguiÃ§Ã£o passe de 0.2 para 1. 
+        FROM pp
+        WHERE id = pp.id_perseguidor;
 
-UPDATE cinematica
-SET g_posicao = novo_posicao( g_posicao, velocidade, 1 )
-FROM pp
-WHERE id = pp.id_perseguidor;
+        UPDATE cinematica
+        SET velocidade = novo_velocidade_PLPGSQL( velocidade, aceleracao, 1 )
+        FROM pp
+        WHERE id = pp.id_perseguidor;
 
-UPDATE cinematica
-SET orientacao = novo_orientacao( orientacao, velocidade, 1 )
-FROM pp
-WHERE id = pp.id_perseguidor;
+        UPDATE cinematica
+        SET g_posicao = novo_posicao( g_posicao, velocidade, 1 )
+        FROM pp
+        WHERE id = pp.id_perseguidor;
+
+        UPDATE cinematica
+        SET orientacao = novo_orientacao_PLPGSQL( orientacao, velocidade, 1 )
+        FROM pp
+        WHERE id = pp.id_perseguidor;
+
+        -- Incrementar o count
+        count := count + 1;
+    END LOOP;
+END
+$$;
 --________________________________________________________________________________________________
 
 
+-- ==========================
+-- Separar os dois movimentos
+-- ==========================
+DROP VIEW IF EXISTS v_trajectoria_1;
+CREATE VIEW v_trajectoria_1 AS
+SELECT *
+FROM cinematica_hist
+WHERE id = 1;
+
+DROP VIEW IF EXISTS v_trajectoria_2;
+CREATE VIEW v_trajectoria_2 AS
+SELECT *
+FROM cinematica_hist
+WHERE id = 2;
 
 
+-- ========================================
+-- Separar as duas estruturas de cinematica
+-- ========================================
+DROP VIEW IF EXISTS v_cinematica_1;
+CREATE VIEW v_cinematica_1 AS
+SELECT *
+FROM cinematica
+WHERE id = 1;
 
-
+DROP VIEW IF EXISTS v_cinematica_2;
+CREATE VIEW v_cinematica_2 AS
+SELECT *
+FROM cinematica
+WHERE id = 2;

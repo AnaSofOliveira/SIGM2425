@@ -1,10 +1,10 @@
 --#############
---# Paulo Trigo
+--# Grupo 04
 --#############
 
 
 --=============
--- Ligação à BD
+-- Ligaï¿½ï¿½o ï¿½ BD
 --=============
 \set dataBase my_gis_aug_real
 ;
@@ -30,9 +30,10 @@ DROP TABLE IF EXISTS pp CASCADE;
 
 -- Suporte 'a nocao de perseguicao
 CREATE TABLE pp(
--- <COMPLETAR>
+    id_perseguidor INT NOT NULL,
+    id_alvo INT NOT NULL
 );
--- <COMPLETAR>
+
 
 
 
@@ -42,8 +43,7 @@ CREATE TABLE pp(
 ---------------------------------------------------
 ---------------------------------------------------
 -- Como exemplo indicar que o ojecto 1 persegue o 2
-INSERT INTO pp( id_perseguidor, id_alvo )
-VALUES( 1, 2 );
+INSERT INTO pp( id_perseguidor, id_alvo ) VALUES( 1, 2 );
 
 SELECT *
 FROM pp;

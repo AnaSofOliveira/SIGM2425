@@ -31,7 +31,8 @@ CREATE TABLE cinematica(
     id INT NOT NULL,
     orientacao REAL,
     velocidade t_velocidade,
-    aceleracao t_aceleracao
+    aceleracao t_aceleracao,
+    PRIMARY KEY (id)
 );
 SELECT AddGeometryColumn( '', 'cinematica', 'g_posicao', 3763, 'POINT', 2 );
 

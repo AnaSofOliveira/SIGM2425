@@ -27,9 +27,14 @@ DROP TYPE IF EXISTS t_aceleracao;
 DROP OPERATOR IF EXISTS *( t_vector, real );
 DROP OPERATOR IF EXISTS *( real, t_vector );
 DROP OPERATOR IF EXISTS +( t_vector, t_vector );
+DROP OPERATOR IF EXISTS -( t_vector, t_vector );
+DROP OPERATOR IF EXISTS -( geometry, geometry );
 DROP FUNCTION IF EXISTS produto_vector_por_escalar( t_vector, real );
 DROP FUNCTION IF EXISTS produto_vector_por_escalar_sql( t_vector, real );
 DROP FUNCTION IF EXISTS soma_vector_vector( t_vector, t_vector );
+DROP FUNCTION IF EXISTS subtrair_vector_PLPGSQL( t_vector, t_vector );
+DROP FUNCTION IF EXISTS geometry_to_tvector( geometry );
+DROP FUNCTION IF EXISTS subtrair_vector( geometry, geometry );
 DROP FUNCTION IF EXISTS normalizar( t_vector );
 DROP TYPE IF EXISTS t_vector;
 ----------------------------------------------------
@@ -254,4 +259,66 @@ SELECT normalizar_PLPGSQL( (3, 4) + (3.5, 4.9) * 5 ) AS v1,
        normalizar_PLPGSQL( ( (3, 4)::t_vector + (3.5, 4.9)::t_vector ) * 5 ) AS v2;
 -- resultado: v1 = (0.5832929, 0.811894); v2 = (0.589789, 0.807557)
 --=================================================================================
+---------------------------------------------------
+-- Novos Operadores 
+---------------------------------------------------
+CREATE OR REPLACE FUNCTION subtrair_vector_PLPGSQL( vec_a t_vector, vec_b t_vector )
+RETURNS t_vector
+AS $$
+DECLARE
+    new_x real;
+    new_y real;
+BEGIN
+    new_x := vec_a.x - vec_b.x;
+    new_y := vec_a.y - vec_b.y;
+    RETURN (new_x, new_y);
+END;
+$$ LANGUAGE plpgsql;
 
+
+CREATE OPERATOR - (
+    leftarg = t_vector,
+    rightarg = t_vector,
+    procedure = subtrair_vector_PLPGSQL,
+    commutator = -
+);
+
+
+-- TESTE
+--______
+\echo -> Testes a subtrair de dois vetores:
+SELECT cast( (3, 4) AS t_vector ) - cast( (3.5, 4.9) AS t_vector ) AS v;
+-- resultado: v = (0.5, 0.9)
+
+--------------------------------------------------
+
+CREATE OR REPLACE FUNCTION geometry_to_tvector(geom geometry)
+RETURNS t_vector
+AS $$
+DECLARE
+    x REAL;
+    y REAL;
+BEGIN
+    x := ST_X(geom);
+    y := ST_Y(geom);
+    RETURN (x, y);
+END;
+$$ LANGUAGE plpgsql;
+
+--------------------------------------------------
+
+
+CREATE OR REPLACE FUNCTION subtrair_geometry( geo_a geometry, geo_b geometry )
+RETURNS t_vector
+AS $$
+SELECT
+    geometry_to_tvector(geo_a) - geometry_to_tvector(geo_b) AS v
+;
+$$ LANGUAGE 'sql';
+
+CREATE OPERATOR - (
+    leftarg = geometry,
+    rightarg = geometry,
+    procedure = subtrair_geometry,
+    commutator = -
+);
