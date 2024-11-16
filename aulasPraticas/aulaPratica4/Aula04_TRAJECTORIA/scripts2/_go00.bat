@@ -1,0 +1,1 @@
+_go _01_comando-osm2pgsql.txt

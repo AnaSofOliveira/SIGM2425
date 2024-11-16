@@ -1,12 +1,12 @@
 --#############
---# Paulo Trigo
+--# GRUPO 04
 --#############
 
 --
 -- a instrucoes contidas neste ficheiro devem ser executadas numa "Command Prompt"
 -- e.g., copiando as instrucoes ou construindo uma .bat
 --
--- estas instrucoes assumem que o "path" corrente contém a pasta "osm2pgsq"
+-- estas instrucoes assumem que o "path" corrente contï¿½m a pasta "osm2pgsq"
 -- (essa e' a pasta criada depois de descompactar a aplicacao em "osm2pgsql.zip")
 
 
@@ -28,7 +28,7 @@
 
 
 -- na "Command Prompt" afetar variavel de ambiente "pgpassword" com a password de acesso ao PostgreSQL
-set pgpassword=A-SUA-PASSWORD
+set pgpassword=123456
 
 
 -- executar para carregar a cidade de lisboa (lisbon.osm.pbf) na base de dados
