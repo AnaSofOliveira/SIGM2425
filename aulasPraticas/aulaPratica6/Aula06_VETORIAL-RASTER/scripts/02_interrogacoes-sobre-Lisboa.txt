@@ -18,18 +18,16 @@
 -- diretivas SQL
 --
 
--- que linhas representam percursos para bicicleta?
+\echo -> Que linhas representam percursos para bicicleta?
+SELECT 
+  ST_AsText( way ) 
+FROM 
+  planet_osm_line
+WHERE 
+  bicycle NOTNULL
+;
 
--- SELECT 
---  ST_AsText( way ) 
--- FROM 
---  planet_osm_line
--- WHERE 
---  bicycle NOTNULL
---;
-
-
--- quantos percursos para bicicleta existem em Lisboa?
+\echo Quantos percursos para bicicleta existem em Lisboa? 
 SELECT COUNT( * )
 FROM
 (
@@ -44,7 +42,7 @@ FROM
 
 
 
--- qual a cota Z dos pontos representados em Lisboa?
+\echo Qual a cota Z dos pontos representados em Lisboa?
 -- http://wiki.openstreetmap.org/wiki/Key:ele
 -- elevation (height above the sea level) of a point in in meters
 -- OSM currently records points with their latitude and longitude (x/y coordinates),
@@ -56,7 +54,7 @@ WHERE ele NOTNULL
 ;
 
 
--- quais dos pontos representados tem informacao sobre percurso para bicicleta
+\echo Quais dos pontos representados tem informacao sobre percurso para bicicleta
 SELECT bicycle
 FROM planet_osm_point
 WHERE bicycle NOTNULL
