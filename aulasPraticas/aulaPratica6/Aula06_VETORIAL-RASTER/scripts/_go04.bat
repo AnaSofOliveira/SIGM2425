@@ -1,0 +1,1 @@
+_go 04_interrogacoes-sobre-raster.txt
