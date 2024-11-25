@@ -1,0 +1,140 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase fuga_selvagem
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+--------------------------------
+-- Criar o Esquema Relacional
+--------------------------------
+
+ALTER TABLE objeto_movel DROP CONSTRAINT fk_cinematica;
+ALTER TABLE objeto_movel DROP CONSTRAINT fk_tipo_objeto_movel;
+
+ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT pk_afetacao_tipo_terreno_objeto_movel;
+ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT fk_tipo_terreno;
+ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT fk_tipo_objeto_movel;
+
+ALTER TABLE cinematica_hist DROP CONSTRAINT fk_cinematica;
+
+ALTER TABLE terreno DROP CONSTRAINT fk_tipo_terreno;
+
+DROP TABLE IF EXISTS objeto_movel;
+DROP TABLE IF EXISTS afetacao_tipo_terreno_tipo_objeto_movel;
+DROP TABLE IF EXISTS tipo_objeto_movel;
+DROP TABLE IF EXISTS cinematica_hist;
+DROP TABLE IF EXISTS cinematica;
+DROP TABLE IF EXISTS terreno;
+DROP TABLE IF EXISTS tipo_terreno;
+
+
+---------------------------------
+-- TIPO_TERRENO
+---------------------------------
+\echo Create Table TIPO_TERRENO
+
+CREATE TABLE tipo_terreno (
+    id_tipo_terreno INTEGER PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL
+);
+
+---------------------------------
+-- TERRENO
+---------------------------------
+\echo Create Table TERRENO
+
+CREATE TABLE terreno (
+    id_terreno INTEGER PRIMARY KEY, 
+    id_tipo_terreno INTEGER NOT NULL, 
+    CONSTRAINT fk_tipo_terreno FOREIGN KEY(id_tipo_terreno) REFERENCES tipo_terreno(id_tipo_terreno) 
+);
+
+SELECT AddGeometryColumn('public', 'terreno', 'geo_terreno', 0, 'GEOMETRY', 2);
+
+---------------------------------
+-- CINEMATICA
+---------------------------------
+\echo Create Table CINEMATICA
+
+CREATE TABLE cinematica (
+    id_cinematica INTEGER PRIMARY KEY, 
+    orientacao REAL NOT NULL,
+    velocidade t_velocidade NOT NULL,
+    aceleracao t_aceleracao NOT NULL,
+    boost real NOT NULL
+);
+
+SELECT AddGeometryColumn('public', 'cinematica', 'geo_ponto', 0, 'POINT', 2);
+
+---------------------------------
+-- CINEMATICA HIST
+---------------------------------
+\echo Create Table CINEMATICA_HIST
+
+CREATE TABLE cinematica_hist (
+    id_cinematica INTEGER,
+    id_cinematica_hist INTEGER, 
+    orientacao REAL NOT NULL,
+    velocidade t_velocidade NOT NULL,
+    aceleracao t_aceleracao NOT NULL,
+    boost real NOT NULL, 
+    CONSTRAINT fk_cinematica FOREIGN KEY(id_cinematica) REFERENCES cinematica(id_cinematica),
+    CONSTRAINT pk_cinematica_hist PRIMARY KEY(id_cinematica_hist, id_cinematica)
+);
+
+SELECT AddGeometryColumn('public', 'cinematica_hist', 'geo_ponto', 0, 'POINT', 2);
+
+---------------------------------
+-- TIPO OBJETO MOVEL
+---------------------------------
+\echo Create Table TIPO_OBJETO_MOVEL
+
+CREATE TABLE tipo_objeto_movel (
+    id_tipo_objeto_movel INTEGER PRIMARY KEY, 
+    nome VARCHAR(255) NOT NULL
+);
+
+---------------------------------
+-- AFETACAO TIPO TERRENO - TIPO OBJETO MOVEL
+---------------------------------
+\echo Create Table AFETACAO_TIPO_TERRENO_TIPO_OBJETO_MOVEL
+
+CREATE TABLE afetacao_tipo_terreno_tipo_objeto_movel (
+    id_tipo_terreno INTEGER NOT NULL,
+    id_tipo_objeto_movel INTEGER NOT NULL,
+    coef_atrito REAL NOT NULL, 
+    CONSTRAINT fk_tipo_terreno FOREIGN KEY(id_tipo_terreno) REFERENCES tipo_terreno(id_tipo_terreno),
+    CONSTRAINT fk_tipo_objeto_movel FOREIGN KEY(id_tipo_objeto_movel) REFERENCES tipo_objeto_movel(id_tipo_objeto_movel),
+    CONSTRAINT pk_afetacao_tipo_terreno_tipo_objeto_movel PRIMARY KEY(id_tipo_terreno, id_tipo_objeto_movel)    
+);
+
+---------------------------------
+-- OBJETO MOVEL
+---------------------------------
+\echo Create Table OBJETO_MOVEL
+
+CREATE TABLE objeto_movel (
+    id_objeto_movel INTEGER PRIMARY KEY,  
+    nome VARCHAR(255) NOT NULL,
+    massa REAL NOT NULL,
+    id_tipo_objeto_movel INTEGER,
+    id_cinematica INTEGER NOT NULL,
+    id_alvo INTEGER, 
+    CONSTRAINT fk_tipo_objeto_movel FOREIGN KEY(id_tipo_objeto_movel) REFERENCES tipo_objeto_movel(id_tipo_objeto_movel),
+    CONSTRAINT fk_cinematica FOREIGN KEY(id_cinematica) REFERENCES cinematica(id_cinematica)
+);
+
+SELECT AddGeometryColumn('public', 'objeto_movel', 'geo_corpo', 0, 'GEOMETRY', 2);

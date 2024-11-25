@@ -22,6 +22,10 @@
 -- Estender o Modelo Relacional com Novas Estruturas
 ----------------------------------------------------
 ----------------------------------------------------
+
+drop function if exists normalizar(t_vector);
+drop function if exists normalizar(t_vector);
+
 DROP TYPE IF EXISTS t_velocidade;
 DROP TYPE IF EXISTS t_aceleracao;
 DROP OPERATOR IF EXISTS *( t_vector, real );
@@ -30,8 +34,10 @@ DROP OPERATOR IF EXISTS +( t_vector, t_vector );
 DROP OPERATOR IF EXISTS -( t_vector, t_vector );
 DROP OPERATOR IF EXISTS -( geometry, geometry );
 DROP FUNCTION IF EXISTS produto_vector_por_escalar( t_vector, real );
+drop function if exists produto_vector_por_escalar_PLGSQL(t_vector, real );
 DROP FUNCTION IF EXISTS produto_vector_por_escalar_sql( t_vector, real );
 DROP FUNCTION IF EXISTS soma_vector_vector( t_vector, t_vector );
+DROP FUNCTION IF EXISTS soma_vector_vector_PLGSQL( t_vector, t_vector );
 DROP FUNCTION IF EXISTS subtrair_vector_PLPGSQL( t_vector, t_vector );
 DROP FUNCTION IF EXISTS geometry_to_tvector( geometry );
 DROP FUNCTION IF EXISTS subtrair_vector( geometry, geometry );
