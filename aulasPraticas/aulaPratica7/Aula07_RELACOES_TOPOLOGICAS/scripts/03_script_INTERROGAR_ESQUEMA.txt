@@ -1,0 +1,162 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis_top
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+-- mais informa��o sobre "client_encoding" em:
+-- http://www.postgresql.org/docs/8.1/static/multibyte.html
+\encoding UTF8;
+
+
+--=================================
+-- Interrogar com Matriz Topologica
+--=================================
+
+
+\echo
+\echo "4.a) Obtenha todas as linhas contidas, ou iguais, a lados de poligonos."
+
+SELECT 
+    l.id, l.nome, ST_AsText(l.geo) as geo
+FROM 
+    geo_1d l, geo_2d p
+WHERE 
+    ST_Relate(p.geo, l.geo , '102**1**2') OR  ST_Relate(p.geo, l.geo , 'FF2101FF2')
+;
+
+\echo
+\echo "4.b) Obtenha todos os pontos contidos em algum dos lados de um poligono."
+
+
+
+SELECT 
+    pt.id, pt.nome, ST_AsText(pt.geo) as geo
+FROM 
+    geo_0d pt, geo_2d p
+WHERE 
+    ST_Relate(p.geo, pt.geo, 'FF20F1FF2')
+;
+
+\echo
+\echo "4.d) Obtenha todos os pontos contidos em algum dos lados de um poligono."
+
+SELECT DISTINCT
+    pt.id, pt.nome, ST_AsText(pt.geo) as geo
+FROM 
+    geo_0d pt, geo_1d l, geo_2d p
+WHERE 
+    ST_Relate(p.geo, l.geo , '**2101FF2') and ST_Relate(l.geo, pt.geo ,'*F1*F0FF2')
+;
+
+\echo
+\echo "4.e) Obtenha todas as linhas que contem outras linhas.."
+
+SELECT 
+    l1.id, l1.nome, l2.nome, ST_AsText(l1.geo) as geo  
+FROM 
+    geo_1d l1, geo_1d l2
+WHERE 
+    ST_Relate(l1.geo, l2.geo , '101FF0**2')
+;
+
+\echo
+\echo "4.f) Considere a figura em 'fig_rio_doca.bmp' e obtenha as docas representadas pelas linhas 3, 4, 5 e 6."
+
+SELECT 
+    l.nome, ST_AsText(l.geo) as geo  
+FROM 
+    geo_1d l, geo_2d p
+WHERE 
+    ST_Relate(p.geo, l.geo , '102**1**2')
+;
+
+\echo
+\echo "4.h) Altere a matriz construida na alinea f de modo a contemplar as linhas adicionadas na alinea anterior (g)."
+
+SELECT 
+    l.nome, ST_AsText(l.geo) as geo  
+FROM 
+    geo_1d l, geo_2d p
+WHERE 
+    ST_Relate(p.geo, l.geo , '**2**1**2')
+;
+
+--==========================
+--==========================
+
+\echo
+\echo "5.a) Obtenha as matrizes topologicas que relacionam todos os objectos 0d e 1d construidos."
+
+SELECT 
+    pt.nome, l.nome, ST_Relate( l.geo, pt.geo) as matrix
+FROM 
+    geo_0d pt, geo_1d l
+; 
+
+\echo
+\echo "5.b) Qual a matriz topologica 'mais geral' que permite recuperar todos os objectos 0d e 1d que construiu? Teste essa matriz."
+\echo "R: *F1*F0*F2"
+
+SELECT 
+    pt.nome, l.nome
+FROM 
+    geo_0d pt, geo_1d l
+WHERE 
+    ST_Relate(l.geo, pt.geo , '*F1*F0*F2')
+;
+
+\echo
+\echo "5.c) Obtenha as matrizes topologicas que relacionam todos os objectos 1d entre si."
+
+SELECT 
+    l1.nome, l2.nome, ST_Relate( l1.geo, l2.geo) as matrix
+FROM 
+    geo_1d l1, geo_1d l2
+; 
+
+\echo
+\echo "5.d) Obtenha todas as matrizes topologicas que relacionam os objectos 1d e 2d construidos."
+
+SELECT 
+    l.nome, p.nome, ST_Relate( p.geo, l.geo) as matrix
+FROM 
+    geo_1d l, geo_2d p
+; 
+
+\echo
+\echo "5.b) Qual a matriz topologica 'mais geral' que permite recuperar todos os objectos 1d e 2d que construiu? Teste essa matriz."
+\echo "R: **2**1**2"
+
+SELECT 
+    l.nome, p.nome
+FROM 
+    geo_1d l, geo_2d p
+WHERE 
+    ST_Relate(p.geo, l.geo , '**2**1**2')
+;
+
+\echo
+\echo "5.f) Obtenha todas as geometrias 0d resultantes de interseccoes entre linhas."
+
+SELECT 
+    l1.nome, l2.nome, ST_AsText(ST_Intersection(l1.geo, l2.geo)) as ponto, ST_Relate( l1.geo, l2.geo) as matrix
+FROM 
+    geo_1d l1, geo_1d l2
+WHERE 
+    l1.id < l2.id
+    AND ST_Relate(l1.geo, l2.geo , '0F1FF0102') or ST_Relate(l1.geo, l2.geo , 'F01FF0102')
+;
+

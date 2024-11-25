@@ -1,0 +1,44 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis_top
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+DROP TABLE IF EXISTS geo_0d;
+DROP TABLE IF EXISTS geo_1d;
+DROP TABLE IF EXISTS geo_2d;
+
+--------------------------------
+-- Criar o Esquema Relacional
+--------------------------------
+
+CREATE TABLE geo_0d (
+    id INTEGER PRIMARY KEY,
+    nome VARCHAR(50)
+);
+SELECT AddGeometryColumn('public', 'geo_0d', 'geo', 0, 'POINT', 2);
+
+CREATE TABLE geo_1d (
+    id INTEGER PRIMARY KEY,
+    nome VARCHAR(50) 
+);
+SELECT AddGeometryColumn('public', 'geo_1d', 'geo', 0, 'LINESTRING', 2);
+
+CREATE TABLE geo_2d (
+    id INTEGER PRIMARY KEY,
+    nome VARCHAR(50) 
+);
+SELECT AddGeometryColumn('public', 'geo_2d', 'geo', 0, 'POLYGON', 2);
+
