@@ -1,0 +1,201 @@
+--#############
+--# Grupo 04
+--#############
+
+
+--=============
+-- Ligacao a BD
+--=============
+\set dataBase fuga_selvagem
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+----------------------------------------------------------
+----------------------------------------------------------
+-- Obter valores de 'cinematica' para um instante do tempo
+----------------------------------------------------------
+----------------------------------------------------------
+
+drop function if exists obter_terreno( int, geometry );
+DROP FUNCTION IF EXISTS novo_posicao( geometry, t_velocidade, real );
+DROP FUNCTION IF EXISTS novo_orientacao( real, t_velocidade, real );
+DROP FUNCTION IF EXISTS novo_velocidade( t_velocidade, t_aceleracao, real );
+
+drop function if exists novo_aceleracao_linear;
+drop function if exists obter_aceleracao_predador;
+drop function if exists obter_aceleracao_presa;
+
+DROP VIEW IF EXISTS v_novo_cinematica;
+----------------------------------------------------------
+
+\echo Create Function novo_velocidade
+CREATE OR REPLACE FUNCTION novo_velocidade( velocidade t_velocidade, aceleracao t_aceleracao, tempo real )
+RETURNS t_velocidade
+AS $$
+DECLARE
+    vel t_velocidade;
+BEGIN
+    vel.linear := velocidade.linear + aceleracao.linear * tempo;
+    vel.angular := velocidade.angular + aceleracao.angular * tempo;
+    RETURN (vel);
+END;
+$$ LANGUAGE plpgsql;
+
+----------------------------------------------------------
+
+\echo Create Function novo_posicao
+CREATE OR REPLACE FUNCTION novo_posicao( g_posicao geometry, velocidade t_velocidade, tempo real )
+RETURNS geometry
+AS $$
+SELECT 
+ST_Translate( $1,
+              (($2).linear * $3 ).x,
+              (($2).linear * $3 ).y )
+$$ LANGUAGE 'sql';
+
+----------------------------------------------------------
+
+\echo Create Function novo_orientacao
+CREATE OR REPLACE FUNCTION novo_orientacao( orientacao real, velocidade t_velocidade, tempo real )
+RETURNS real
+AS $$
+BEGIN
+    RETURN orientacao + velocidade.angular * tempo;
+END;
+$$ LANGUAGE plpgsql;
+
+----------------------------------------------------------
+
+\echo Create Function novo_aceleracao_linear
+CREATE OR REPLACE FUNCTION novo_aceleracao_linear( g_posicao_perseguidor geometry, g_posicao_alvo geometry, velocidade_a_perseguir real, massa_perseguidor real , coef_atrito real )
+RETURNS t_vector
+AS $$
+DECLARE
+    v t_vector;
+    f_atrito real;
+    a_atrito t_vector;
+BEGIN
+    v := normalizar(g_posicao_alvo - g_posicao_perseguidor) * velocidade_a_perseguir;
+    f_atrito := coef_atrito * massa_perseguidor * 9.8;
+    v := normalizar(v) * f_atrito / massa_perseguidor; -- condiderar f_atrito/ massa_perseguidor
+    RETURN v;
+END;
+$$ LANGUAGE plpgsql;
+
+----------------------------------------------------------
+
+\echo Create Function obter_terreno
+CREATE OR REPLACE FUNCTION obter_terreno( idTerreno int, nova_posicao geometry )
+RETURNS boolean
+AS $$
+DECLARE
+    geo_terreno geometry;
+BEGIN
+    geo_terreno := (SELECT terreno.geo_terreno FROM terreno WHERE terreno.id_terreno = idTerreno);
+    RETURN ST_Contains(geo_terreno, nova_posicao);
+END;
+$$ LANGUAGE plpgsql;
+
+\echo Testes para obter_terreno
+select 
+    terreno.id_terreno,
+    tipo_terreno.nome as tipo_terreno,
+    terreno.z_index,
+    obter_terreno( terreno.id_terreno, ST_GeomFromText('POINT(175 60)') ) as dentro
+FROM terreno
+left join tipo_terreno on terreno.id_tipo_terreno = tipo_terreno.id_tipo_terreno
+--order by terreno.z_index desc
+--limit 1
+;
+----------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION obter_terreno( nova_posicao geometry )
+RETURNS int
+AS $$
+DECLARE
+    id_terreno int;
+BEGIN
+    id_terreno := (SELECT terreno.id_terreno 
+        FROM terreno 
+        WHERE ST_Contains(terreno.geo_terreno, nova_posicao)
+        ORDER BY terreno.z_index DESC
+        LIMIT 1);
+    RETURN id_terreno;
+END;
+$$ LANGUAGE plpgsql;
+
+----------------------------------------------------------
+
+\echo Create Function obter_aceleracao
+CREATE OR REPLACE FUNCTION obter_aceleracao( id_perseguidor int, id_presa int, velocidade_a_perseguir real, id_tipo_terr int)
+RETURNS t_aceleracao
+AS $$
+DECLARE
+    c_atrito real;
+BEGIN
+    if id_presa IS NULL THEN
+        RETURN (SELECT c_objeto_movel.aceleracao 
+                FROM objeto_movel as objeto_movel
+                    LEFT JOIN cinematica as c_objeto_movel ON objeto_movel.id_cinematica = c_objeto_movel.id_cinematica 
+                WHERE objeto_movel.id_objeto_movel = id_perseguidor);
+    END IF;
+
+    c_atrito := (SELECT afetacao.coef_atrito 
+                    FROM afetacao_tipo_terreno_tipo_objeto_movel as afetacao 
+                    WHERE afetacao.id_tipo_objeto_movel = (SELECT predador.id_tipo_objeto_movel 
+                                                           FROM objeto_movel as predador 
+                                                           WHERE predador.id_objeto_movel = id_perseguidor) 
+                      AND afetacao.id_tipo_terreno = id_tipo_terr);
+    IF c_atrito IS NULL THEN
+        c_atrito := 1;
+    END IF;
+
+    RETURN (SELECT (novo_aceleracao_linear(c_predador.geo_ponto, c_presa.geo_ponto, velocidade_a_perseguir, predador.massa, c_atrito), 
+                    (c_predador.aceleracao).angular)::t_aceleracao
+            FROM objeto_movel as predador
+                left join objeto_movel as presa on presa.id_objeto_movel = id_presa
+                left join cinematica as c_predador on predador.id_cinematica = c_predador.id_cinematica
+                left join cinematica as c_presa on presa.id_cinematica = c_presa.id_cinematica
+            WHERE predador.id_objeto_movel = id_perseguidor AND presa.id_objeto_movel = id_presa
+            )    
+    ;
+END;
+$$ LANGUAGE plpgsql;
+
+
+\echo Create Function obter_aceleracao_presa
+CREATE OR REPLACE FUNCTION obter_aceleracao_presa( id_perseguidor int, velocidade_a_perseguir real, id_tipo_terreno int)
+RETURNS t_aceleracao
+AS $$
+SELECT novo_aceleracao_linear( c_predador.geo_ponto, c_presa.geo_ponto, $3, predador.massa, afetacao.coef_atrito )*(-1), (c_predador.aceleracao).angular*(-1)
+from objeto_movel as predador
+left join objeto_movel as presa on presa.id_objeto_movel = $2
+left join cinematica as c_predador on predador.id_cinematica = c_predador.id_cinematica
+left join cinematica as c_presa on presa.id_cinematica = c_presa.id_cinematica
+left join afetacao_tipo_terreno_tipo_objeto_movel as afetacao on afetacao.id_tipo_objeto_movel = predador.id_tipo_objeto_movel and afetacao.id_tipo_terreno = $4
+where predador.id_objeto_movel = $1 and presa.id_objeto_movel = $2
+$$ LANGUAGE 'sql'
+;
+
+----------------------------------------------------------
+
+-- CREATE VIEW v_novo_cinematica AS
+SELECT cinematica.id_cinematica AS id_cinematica,
+        objeto_movel.id_objeto_movel AS id_objeto_movel,
+        ST_AsText(cinematica.geo_ponto) AS g_posicao,
+        cinematica.orientacao AS orientacao,
+        cinematica.velocidade AS velocidade,
+        cinematica.aceleracao AS aceleracao,
+        cinematica.boost AS boost,
+        novo_orientacao( cinematica.orientacao, cinematica.velocidade, 2 ) AS nova_orientacao,
+        novo_velocidade( cinematica.velocidade, cinematica.aceleracao, 2 ) AS nova_velocidade,
+        ST_AsText( novo_posicao( cinematica.geo_ponto, cinematica.velocidade, 2 ) ) AS nova_posicao_texto
+FROM objeto_movel
+left join cinematica on objeto_movel.id_cinematica = cinematica.id_cinematica
+-- where objeto_movel.id_objeto_movel = 1
+;

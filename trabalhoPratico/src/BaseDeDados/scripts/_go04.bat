@@ -1,1 +1,1 @@
-_go 03_script_CRIAR_VISTAS.txt
+_go 04_SIMULAR_COMPORTAMENTO.txt

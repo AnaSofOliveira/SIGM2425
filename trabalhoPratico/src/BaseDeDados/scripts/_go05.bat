@@ -1,1 +1,1 @@
-_go 04_script_ACTUALIZAR_DADOS.txt
+_go 05_script_POVOAR_ESQUEMA.txt

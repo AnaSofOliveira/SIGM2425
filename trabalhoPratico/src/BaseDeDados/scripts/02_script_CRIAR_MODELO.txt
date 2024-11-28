@@ -24,11 +24,11 @@
 ALTER TABLE objeto_movel DROP CONSTRAINT fk_cinematica;
 ALTER TABLE objeto_movel DROP CONSTRAINT fk_tipo_objeto_movel;
 
-ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT pk_afetacao_tipo_terreno_objeto_movel;
+ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT pk_afetacao_tipo_terreno_tipo_objeto_movel;
 ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT fk_tipo_terreno;
 ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT fk_tipo_objeto_movel;
 
-ALTER TABLE cinematica_hist DROP CONSTRAINT fk_cinematica;
+ALTER TABLE gps_ponto DROP CONSTRAINT fk_gps_ponto_id_terreno;
 
 ALTER TABLE terreno DROP CONSTRAINT fk_tipo_terreno;
 
@@ -37,6 +37,7 @@ DROP TABLE IF EXISTS afetacao_tipo_terreno_tipo_objeto_movel;
 DROP TABLE IF EXISTS tipo_objeto_movel;
 DROP TABLE IF EXISTS cinematica_hist;
 DROP TABLE IF EXISTS cinematica;
+DROP TABLE IF EXISTS gps_ponto;
 DROP TABLE IF EXISTS terreno;
 DROP TABLE IF EXISTS tipo_terreno;
 
@@ -59,10 +60,24 @@ CREATE TABLE tipo_terreno (
 CREATE TABLE terreno (
     id_terreno INTEGER PRIMARY KEY, 
     id_tipo_terreno INTEGER NOT NULL, 
+    z_index INTEGER NOT NULL,
     CONSTRAINT fk_tipo_terreno FOREIGN KEY(id_tipo_terreno) REFERENCES tipo_terreno(id_tipo_terreno) 
 );
 
 SELECT AddGeometryColumn('public', 'terreno', 'geo_terreno', 0, 'GEOMETRY', 2);
+
+---------------------------------
+-- GPS_PONTO
+---------------------------------
+
+CREATE TABLE gps_ponto (
+    id_ordem INTEGER,
+    id_terreno INTEGER, 
+    CONSTRAINT pk_gps_ponto PRIMARY KEY(id_ordem, id_terreno), 
+    CONSTRAINT fk_gps_ponto_id_terreno FOREIGN KEY(id_terreno) REFERENCES terreno(id_terreno)
+);
+
+SELECT AddGeometryColumn('public', 'gps_ponto', 'g_ponto', 0, 'POINT', 2);
 
 ---------------------------------
 -- CINEMATICA
@@ -85,14 +100,12 @@ SELECT AddGeometryColumn('public', 'cinematica', 'geo_ponto', 0, 'POINT', 2);
 \echo Create Table CINEMATICA_HIST
 
 CREATE TABLE cinematica_hist (
-    id_cinematica INTEGER,
-    id_cinematica_hist INTEGER, 
+    id_cinematica_hist SERIAL PRIMARY KEY,
+    id_cinematica INTEGER NOT NULL, 
     orientacao REAL NOT NULL,
     velocidade t_velocidade NOT NULL,
     aceleracao t_aceleracao NOT NULL,
-    boost real NOT NULL, 
-    CONSTRAINT fk_cinematica FOREIGN KEY(id_cinematica) REFERENCES cinematica(id_cinematica),
-    CONSTRAINT pk_cinematica_hist PRIMARY KEY(id_cinematica_hist, id_cinematica)
+    boost real NOT NULL
 );
 
 SELECT AddGeometryColumn('public', 'cinematica_hist', 'geo_ponto', 0, 'POINT', 2);

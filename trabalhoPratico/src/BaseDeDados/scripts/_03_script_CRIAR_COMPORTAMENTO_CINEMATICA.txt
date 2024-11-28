@@ -100,7 +100,7 @@ SELECT c.id AS id,
        novo_orientacao( c.orientacao, c.velocidade, 2 ) AS orientacao,
        novo_velocidade( c.velocidade, c.aceleracao, 2 ) AS velocidade,
        c.aceleracao,
-       ST_AsText( novo_posicao( om.geo_posicao, c.velocidade, 2 ) ) AS posicao_texto,
+       ST_AsText( novo_posicao( c.g_posicao, c.velocidade, 2 ) ) AS posicao_texto,
        novo_posicao( om.geo_posicao, c.velocidade, 2 ) AS posicao
 FROM cinematica c
 LEFT JOIN objeto_movel om ON c.id = om.id_cinematica;

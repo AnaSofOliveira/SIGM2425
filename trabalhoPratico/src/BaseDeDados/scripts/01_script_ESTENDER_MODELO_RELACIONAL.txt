@@ -22,15 +22,8 @@
 -- Estender o Modelo Relacional com Novas Estruturas
 ----------------------------------------------------
 ----------------------------------------------------
-drop function if exists novo_velocidade;
-drop function if exists novo_orientacao;
-drop function if exists novo_posicao;
-drop function if exists novo_aceleracao_linear;
-drop function if exists obter_aceleracao_predador;
-drop function if exists obter_aceleracao_presa;
 
 DROP OPERATOR IF EXISTS *( t_vector, real );
-DROP OPERATOR IF EXISTS *( real, t_vector );
 DROP OPERATOR IF EXISTS +( t_vector, t_vector );
 DROP OPERATOR IF EXISTS -( t_vector, t_vector );
 DROP OPERATOR IF EXISTS -( geometry, geometry );
@@ -167,6 +160,28 @@ CREATE OPERATOR - (
     rightarg = geometry,
     procedure = subtrair_geometry,
     commutator = -
+);
+
+----------------------------------------------------
+
+CREATE OR REPLACE FUNCTION divisao_vector_por_escalar( vec t_vector, v real )
+RETURNS t_vector
+AS $$
+DECLARE
+    new_x real;
+    new_y real;
+BEGIN
+    new_x := vec.x / v;
+    new_y := vec.y / v;
+    RETURN (new_x, new_y);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OPERATOR / (
+    leftarg = t_vector,
+    rightarg = real,
+    procedure = produto_vector_por_escalar,
+    commutator = /
 );
 
 ----------------------------------------------------
