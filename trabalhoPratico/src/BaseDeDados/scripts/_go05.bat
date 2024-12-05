@@ -1,1 +1,1 @@
-_go 05_script_POVOAR_ESQUEMA.txt
+_go 05_SIMULAR_COMPORTAMENTO.txt

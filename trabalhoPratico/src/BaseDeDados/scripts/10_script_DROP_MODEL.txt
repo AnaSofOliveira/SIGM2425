@@ -55,9 +55,8 @@ DROP FUNCTION IF EXISTS novo_orientacao( real, t_velocidade, real );
 DROP FUNCTION IF EXISTS novo_velocidade( t_velocidade, t_aceleracao, real );
 
 drop function if exists novo_aceleracao_linear;
-drop function if exists obter_aceleracao_perseguidor;
-drop function if exists obter_aceleracao_predador;
-drop function if exists obter_aceleracao_presa;
+drop function if exists obter_aceleracao(integer,integer,real,integer);
+
 
 DROP VIEW IF EXISTS v_novo_cinematica;
 
@@ -96,15 +95,20 @@ DROP OPERATOR IF EXISTS *( real, t_vector );
 DROP OPERATOR IF EXISTS +( t_vector, t_vector );
 DROP OPERATOR IF EXISTS -( t_vector, t_vector );
 DROP OPERATOR IF EXISTS -( geometry, geometry );
+DROP OPERATOR IF EXISTS /( t_vector, real );
+DROP OPERATOR IF EXISTS /(real,t_vector);
+
 DROP FUNCTION IF EXISTS produto_vector_por_escalar( t_vector, real );
 DROP FUNCTION IF EXISTS soma_vector_vector( t_vector, t_vector );
 DROP FUNCTION IF EXISTS subtrair_vector( t_vector, t_vector );
 DROP FUNCTION IF EXISTS subtrair_geometry( geometry, geometry );
 DROP FUNCTION IF EXISTS geometry_to_tvector( geometry );
 DROP FUNCTION IF EXISTS normalizar( t_vector );
+DROP FUNCTION IF EXISTS divisao_vector_por_escalar(t_vector,real);
 
 DROP TYPE IF EXISTS t_velocidade;
 DROP TYPE IF EXISTS t_aceleracao;
 DROP TYPE IF EXISTS t_vector;
+
 
 

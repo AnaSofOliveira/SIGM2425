@@ -24,7 +24,6 @@
 --------------------------------------------
 --------------------------------------------
 
-\echo -> Simulacao de perseguicao:
 DO
 $$
 DECLARE
@@ -32,6 +31,7 @@ DECLARE
     count INT := 0;
 BEGIN
     WHILE count < nIteracoes LOOP
+
         -- (A)
         INSERT INTO cinematica_hist
         SELECT nextval('cinematica_hist_id_cinematica_hist_seq'), id_cinematica, orientacao, velocidade, aceleracao, boost, geo_ponto
@@ -71,85 +71,113 @@ $$;
 -- ==========================
 -- Separar os dois movimentos
 -- ==========================
+\echo criar views das trajetorias
 DROP VIEW IF EXISTS v_trajectoria_1;
 CREATE VIEW v_trajectoria_1 AS
 SELECT 
     cinematica_hist.*, 
-    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao
+    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao, 
+    objeto_movel.id_objeto_movel as id, 
+    tipo_objeto_movel.nome as tipo
 FROM objeto_movel
     left join cinematica_hist on objeto_movel.id_cinematica = cinematica_hist.id_cinematica 
+    left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel
 WHERE objeto_movel.id_objeto_movel = 1;
 
 DROP VIEW IF EXISTS v_trajectoria_2;
 CREATE VIEW v_trajectoria_2 AS
 SELECT 
     cinematica_hist.*, 
-    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao
+    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao,
+    objeto_movel.id_objeto_movel as id, 
+    tipo_objeto_movel.nome as tipo
 FROM objeto_movel
-    left join cinematica_hist on objeto_movel.id_cinematica = cinematica_hist.id_cinematica 
+    left join cinematica_hist on objeto_movel.id_cinematica = cinematica_hist.id_cinematica
+    left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel 
 WHERE objeto_movel.id_objeto_movel = 2;
 
 DROP VIEW IF EXISTS v_trajectoria_3;
 CREATE VIEW v_trajectoria_3 AS
 SELECT 
     cinematica_hist.*, 
-    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao
+    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao,
+    objeto_movel.id_objeto_movel as id, 
+    tipo_objeto_movel.nome as tipo
 FROM objeto_movel
     left join cinematica_hist on objeto_movel.id_cinematica = cinematica_hist.id_cinematica 
+    left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel 
 WHERE objeto_movel.id_objeto_movel = 3;
 
 DROP VIEW IF EXISTS v_trajectoria_4;
 CREATE VIEW v_trajectoria_4 AS
 SELECT 
     cinematica_hist.*, 
-    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao
+    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao,
+    objeto_movel.id_objeto_movel as id, 
+    tipo_objeto_movel.nome as tipo
 FROM objeto_movel
     left join cinematica_hist on objeto_movel.id_cinematica = cinematica_hist.id_cinematica 
+    left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel 
 WHERE objeto_movel.id_objeto_movel = 4;
 
 DROP VIEW IF EXISTS v_trajectoria_5;
 CREATE VIEW v_trajectoria_5 AS
 SELECT 
     cinematica_hist.*, 
-    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao
+    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao,
+    objeto_movel.id_objeto_movel as id, 
+    tipo_objeto_movel.nome as tipo
 FROM objeto_movel
     left join cinematica_hist on objeto_movel.id_cinematica = cinematica_hist.id_cinematica 
+    left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel 
 WHERE objeto_movel.id_objeto_movel = 5;
 
 DROP VIEW IF EXISTS v_trajectoria_6;
 CREATE VIEW v_trajectoria_6 AS
 SELECT 
     cinematica_hist.*, 
-    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao
+    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao,
+    objeto_movel.id_objeto_movel as id, 
+    tipo_objeto_movel.nome as tipo
 FROM objeto_movel
     left join cinematica_hist on objeto_movel.id_cinematica = cinematica_hist.id_cinematica 
+    left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel 
 WHERE objeto_movel.id_objeto_movel = 6;
 
 DROP VIEW IF EXISTS v_trajectoria_7;
 CREATE VIEW v_trajectoria_7 AS
 SELECT 
     cinematica_hist.*, 
-    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao
+    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao,
+    objeto_movel.id_objeto_movel as id, 
+    tipo_objeto_movel.nome as tipo
 FROM objeto_movel
     left join cinematica_hist on objeto_movel.id_cinematica = cinematica_hist.id_cinematica 
+    left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel 
 WHERE objeto_movel.id_objeto_movel = 7;
 
 DROP VIEW IF EXISTS v_trajectoria_8;
 CREATE VIEW v_trajectoria_8 AS
 SELECT 
     cinematica_hist.*, 
-    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao
+    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao,
+    objeto_movel.id_objeto_movel as id, 
+    tipo_objeto_movel.nome as tipo
 FROM objeto_movel
     left join cinematica_hist on objeto_movel.id_cinematica = cinematica_hist.id_cinematica 
+    left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel 
 WHERE objeto_movel.id_objeto_movel = 8;
 
 DROP VIEW IF EXISTS v_trajectoria_9;
 CREATE VIEW v_trajectoria_9 AS
 SELECT 
     cinematica_hist.*, 
-    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao
+    ST_SetSRID(cinematica_hist.geo_ponto, 4326) as g_posicao,
+    objeto_movel.id_objeto_movel as id, 
+    tipo_objeto_movel.nome as tipo
 FROM objeto_movel
     left join cinematica_hist on objeto_movel.id_cinematica = cinematica_hist.id_cinematica 
+    left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel 
 WHERE objeto_movel.id_objeto_movel = 9;
 
 
@@ -158,6 +186,7 @@ WHERE objeto_movel.id_objeto_movel = 9;
 -- ========================================
 -- Separar as duas estruturas de cinematica
 -- ========================================
+\echo criar views das cinematicas
 DROP VIEW IF EXISTS v_cinematica_1;
 CREATE VIEW v_cinematica_1 AS
 SELECT 
@@ -165,7 +194,7 @@ SELECT
     ST_SetSRID(cinematica.geo_ponto, 4326) as g_posicao
 FROM objeto_movel
     left join cinematica on objeto_movel.id_cinematica = cinematica.id_cinematica 
-WHERE objeto_movel.id_objeto_movel = 9;
+WHERE objeto_movel.id_objeto_movel = 1;
 
 DROP VIEW IF EXISTS v_cinematica_2;
 CREATE VIEW v_cinematica_2 AS
@@ -239,3 +268,50 @@ FROM objeto_movel
     left join cinematica on objeto_movel.id_cinematica = cinematica.id_cinematica 
 WHERE objeto_movel.id_objeto_movel = 9;
 
+
+
+
+
+DROP VIEW IF EXISTS v_florestas;
+
+CREATE VIEW v_florestas AS
+SELECT 
+    terreno.id_terreno,
+    tipo_terreno.id_tipo_terreno, 
+    ST_SetSRID(terreno.geo_terreno, 4326) as geo_terreno
+from terreno
+left join tipo_terreno on terreno.id_tipo_terreno = tipo_terreno.id_tipo_terreno
+where tipo_terreno.nome = 'Floresta';
+
+DROP VIEW IF EXISTS v_lagos;
+
+CREATE VIEW v_lagos AS
+SELECT 
+    terreno.id_terreno,
+    tipo_terreno.id_tipo_terreno, 
+    ST_SetSRID(terreno.geo_terreno, 4326) as geo_terreno
+from terreno
+left join tipo_terreno on terreno.id_tipo_terreno = tipo_terreno.id_tipo_terreno
+where tipo_terreno.nome = 'Lago';
+
+DROP VIEW IF EXISTS v_pantanos;
+
+CREATE VIEW v_pantanos AS
+SELECT 
+    terreno.id_terreno,
+    tipo_terreno.id_tipo_terreno, 
+    ST_SetSRID(terreno.geo_terreno, 4326) as geo_terreno
+from terreno
+left join tipo_terreno on terreno.id_tipo_terreno = tipo_terreno.id_tipo_terreno
+where tipo_terreno.nome = 'Pantano';
+
+DROP VIEW IF EXISTS v_cultivos;
+
+CREATE VIEW v_cultivos AS
+SELECT 
+    terreno.id_terreno,
+    tipo_terreno.id_tipo_terreno, 
+    ST_SetSRID(terreno.geo_terreno, 4326) as geo_terreno
+from terreno
+left join tipo_terreno on terreno.id_tipo_terreno = tipo_terreno.id_tipo_terreno
+where tipo_terreno.nome = 'Cultivo';
