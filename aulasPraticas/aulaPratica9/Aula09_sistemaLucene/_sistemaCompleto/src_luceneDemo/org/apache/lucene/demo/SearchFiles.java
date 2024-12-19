@@ -113,6 +113,18 @@ public class SearchFiles {
       if (line.length() == 0) {
         break;
       }
+
+      // Split the query string into individual terms
+      String[] terms = line.split(":");
+      Boolean nome = false;
+
+      if(terms.length > 1){
+        if(terms[0].equals("nome")){
+          line = terms[1];
+          nome = true;
+        }
+      }
+
       
       Query query = parser.parse(line);
       System.out.println("Searching for: " + query.toString(field));
@@ -126,7 +138,9 @@ public class SearchFiles {
         System.out.println("Time: "+(end.getTime()-start.getTime())+"ms");
       }
 
-      doPagingSearch(in, searcher, query, hitsPerPage, raw, queries == null && queryString == null);
+
+
+      doPagingSearch(in, searcher, query, hitsPerPage, raw, queries == null && queryString == null, nome);
 
       if (queryString != null) {
         break;
@@ -146,7 +160,7 @@ public class SearchFiles {
    * 
    */
   public static void doPagingSearch(BufferedReader in, IndexSearcher searcher, Query query, 
-                                     int hitsPerPage, boolean raw, boolean interactive) throws IOException {
+                                     int hitsPerPage, boolean raw, boolean interactive, boolean nome) throws IOException {
  
     // Collect enough docs to show 5 pages
     TopDocs results = searcher.search(query, 5 * hitsPerPage);
@@ -179,10 +193,14 @@ public class SearchFiles {
         }
 
         Document doc = searcher.doc(hits[i].doc);
+        
+        if(nome == true){
+          System.out.println("Nome: " + doc.get("nome"));
+        }
+
         String path = doc.get("path");
         if (path != null) {
           System.out.println((i+1) + ". " + path);
-          System.out.println("Nome: " + doc.get("nome"));
           String title = doc.get("title");
           if (title != null) {
             System.out.println("   Title: " + doc.get("title"));
