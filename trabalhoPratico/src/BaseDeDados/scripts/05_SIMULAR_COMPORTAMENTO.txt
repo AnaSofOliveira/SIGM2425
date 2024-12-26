@@ -27,7 +27,7 @@
 DO
 $$
 DECLARE
-    nIteracoes INT := 15;  -- Número de iterações
+    nIteracoes INT := 30;  -- Número de iterações
     count INT := 0;
 BEGIN
     WHILE count < nIteracoes LOOP
@@ -40,7 +40,7 @@ BEGIN
 
         -- (B) Predador a perseguir a presa
         UPDATE cinematica
-        SET aceleracao = obter_aceleracao( objeto_movel.id_objeto_movel, objeto_movel.id_alvo, 0.02::real, obter_terreno( cinematica.geo_ponto ) )  
+        SET aceleracao = obter_aceleracao( objeto_movel.id_objeto_movel, objeto_movel.id_alvo, cinematica.boost, obter_terreno( cinematica.geo_ponto ) )  
         FROM objeto_movel
         WHERE objeto_movel.id_cinematica = cinematica.id_cinematica;
 

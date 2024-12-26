@@ -37,11 +37,25 @@ CREATE OR REPLACE FUNCTION novo_velocidade( velocidade t_velocidade, aceleracao 
 RETURNS t_velocidade
 AS $$
 DECLARE
+    velocidade_maxima t_velocidade;
     vel t_velocidade;
 BEGIN
+    RAISE NOTICE ' ';
+    RAISE NOTICE ' ';
+    RAISE NOTICE 'NOVO VELOCIDADE: ';
+    RAISE NOTICE '* velocidade inicial: %', velocidade;
+
     vel.linear := velocidade.linear + aceleracao.linear * tempo;
     vel.angular := velocidade.angular + aceleracao.angular * tempo;
-    RETURN (vel);
+
+    RAISE NOTICE '* novo velocidade: %', vel;
+
+    if vel.linear > velocidade_maxima.linear THEN
+        RAISE NOTICE '* ajustado à velocidade maxima: %', velocidade_maxima;
+        return velocidade_maxima;
+    else
+        return vel;
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -78,31 +92,47 @@ DECLARE
     a t_vector;
     f_atrito real;
     coef_atrito real;
-    massa real;
     posicao_predador geometry;
     posicao_presa geometry;
-    id_terreno int;
+    id_terr int;
 BEGIN
 
+    RAISE NOTICE ' ';
+    RAISE NOTICE ' ';
+    RAISE NOTICE 'NOVO ACELERACAO: ';
     posicao_predador := (SELECT cinematica.geo_ponto FROM cinematica WHERE cinematica.id_cinematica = predador.id_cinematica);
     posicao_presa := (SELECT cinematica.geo_ponto FROM cinematica WHERE cinematica.id_cinematica = presa.id_cinematica);
 
-    id_terreno := obter_terreno(posicao_predador);
+    RAISE NOTICE '* posicao do predador: %', ST_AsText(posicao_predador);
+    RAISE NOTICE '* posicao da presa: %', ST_AsText(posicao_presa);
 
-    massa := predador.massa;
+    id_terr := obter_terreno(posicao_predador);
+
+    RAISE NOTICE '* id do terreno: %', id_terr;
+
     coef_atrito := (select afetacao.coef_atrito 
                     from afetacao_tipo_terreno_tipo_objeto_movel as afetacao
-                    where afetacao.id_tipo_objeto_movel = predador.id_tipo_objeto_movel and afetacao.id_tipo_terreno = id_terreno
-                    );
+                    left join terreno on terreno.id_terreno = id_terr
+                    where afetacao.id_tipo_objeto_movel = predador.id_tipo_objeto_movel and afetacao.id_tipo_terreno = terreno.id_tipo_terreno);
 
     if coef_atrito IS NULL THEN
-        coef_atrito := 1;
-    END IF;    
+        coef_atrito := 0;
+    END IF;
 
-    a := normalizar(posicao_presa - posicao_predador) * velocidade_a_perseguir;
-    f_atrito := coef_atrito * massa * 9.8;
+    RAISE NOTICE '* coeficiente de atrito: %', coef_atrito;
+    RAISE NOTICE ' ';
     
-    a := a - ((-1,-1) * (f_atrito/massa)); -- condiderar f_atrito/ massa_perseguidor
+    a := normalizar(posicao_presa - posicao_predador) * velocidade_a_perseguir;
+
+    RAISE NOTICE '* aceleracao sem atrito: %', a;
+    
+    a := a - ((1,1) * coef_atrito);
+
+    RAISE NOTICE '* aceleracao com atrito: %', a;
+    RAISE NOTICE '* aceleracao saida: %', a;
+    RAISE NOTICE ' ';
+    RAISE NOTICE ' ';
+
     RETURN a;
 END;
 $$ LANGUAGE plpgsql;
@@ -139,7 +169,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-\echo Testes para obter_terreno2
+\echo Testes para obter_terreno
 select 
     terreno.id_terreno,
     tipo_terreno.nome as tipo_terreno,
@@ -157,14 +187,26 @@ RETURNS t_aceleracao
 AS $$
 DECLARE
     aceleracao t_aceleracao;
+    aceleracao_maxima t_aceleracao;
 BEGIN
+
+    RAISE NOTICE ' ';
+    RAISE NOTICE ' ';
+    RAISE NOTICE 'OBTER ACELERACAO:';
+    aceleracao_maxima = (SELECT c_objeto_movel.aceleracao_maxima
+                        FROM objeto_movel as objeto_movel
+                            LEFT JOIN cinematica as c_objeto_movel ON objeto_movel.id_cinematica = c_objeto_movel.id_cinematica 
+                        WHERE objeto_movel.id_objeto_movel = id_perseguidor);
+
     if id_presa IS NULL THEN
         aceleracao := (SELECT c_objeto_movel.aceleracao
                         FROM objeto_movel as objeto_movel
                             LEFT JOIN cinematica as c_objeto_movel ON objeto_movel.id_cinematica = c_objeto_movel.id_cinematica 
                         WHERE objeto_movel.id_objeto_movel = id_perseguidor);
+        RAISE NOTICE '* Sem presa (aceleracao igual aceleracao do objeto): %', aceleracao;
+
     ELSE
-        aceleracao := (SELECT (novo_aceleracao_linear(predador, presa, 0.2), 
+        aceleracao := (SELECT (novo_aceleracao_linear(predador, presa, velocidade_a_perseguir), 
 	                (c_predador.aceleracao).angular)::t_aceleracao as aceleracao
             FROM objeto_movel as predador
                 left join objeto_movel as presa on presa.id_objeto_movel = id_presa
@@ -172,8 +214,17 @@ BEGIN
                 left join cinematica as c_presa on presa.id_cinematica = c_presa.id_cinematica
             WHERE predador.id_objeto_movel = id_perseguidor AND presa.id_objeto_movel = id_presa
             );
+        RAISE NOTICE '* Com presa (aceleracao calculada): %', aceleracao;
+        
     END IF;
-    RETURN (aceleracao);   
+    RAISE NOTICE ' ';
+    RAISE NOTICE ' ';
+    
+    if aceleracao.linear > aceleracao_maxima.linear THEN
+        return aceleracao_maxima;
+    ELSE
+        return aceleracao;
+    END IF;  
 END;
 $$ LANGUAGE plpgsql;
 

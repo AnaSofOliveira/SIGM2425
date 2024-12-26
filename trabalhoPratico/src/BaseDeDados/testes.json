@@ -1,0 +1,88 @@
+{"function_name": "fill_null_values", 
+"function_parameters": {
+    "fill_mapping": {
+        "DataModificacao": "1900-01-01", 
+        "DataExclusao": "1900-01-01", 
+        "IdPais": "-3"
+        }
+    }
+}
+
+
+
+{
+    "function_name": "fill_null_values", 
+    "function_parameters": {
+        "fill_mapping" : {
+            "DescricaoPredial" : "Desconhecido", 
+            "IdEntidade" : "Desconhecido", 
+            "Tecnico" : "Desconhecido", 
+            "IsHeranca" : "False", 
+            "NifHeranca" : "Desconhecido", 
+            "HasTitular" : "False", 
+            "IsPromotorRepresentante" : "False", 
+            "DataRecolha" : "1900-01-01", 
+            "DataFinalizacao" : "1900-01-01", 
+            "UpdatedAt" : "1900-01-01", 
+            "AreaTotal" : -2, 
+            "HasContatoAlternativo" : "False"
+        }
+    }
+}
+
+
+
+
+{"function_name": "fill_null_values", 
+"function_parameters": {
+    "fill_mapping" : {
+        "DataModificacao" : "1900-01-01",
+        "DataExclusao": "1900-01-01"
+    }
+}]
+
+
+[{"function_name": "fill_null_values", 
+"function_parameters": {
+    "fill_mapping" : {
+        "DataModificacao" : "1900-01-01", 
+        "DataExclusao": "1900-01-01" 
+    }
+}}]
+
+
+
+{"function_name": "fill_null_values", 
+"function_parameters": 
+    {"fill_mapping" : {
+        "DataModificacao" : "1900-01-01", 
+        "DataExclusao": "1900-01-01",
+        "IdPais": -3
+    }
+}
+}
+
+
+
+[{"function_name": "fill_null_values", "function_parameters": {"fill_mapping" : {"IdTipoEntidade" : -3}}}]
+
+
+
+
+
+[{"function_name": "fill_null_values", "function_parameters": {"fill_mapping" : {"DataModificacao" : "1900-01-01", "DataExclusao": "1900-01-01", "IdPais": -3}}}]
+
+
+
+[{"function_name": "case_type_conversion", 
+"function_parameters": { 
+    "column_name": "Localizacao", 
+    "case_type": "upper"}}]
+
+    [{"function_name": "case_type_conversion", 
+    "function_parameters": { 
+        "column_name": "Designacao", 
+        "case_type": "upper"}}]
+
+
+    , { "column_name": "Designacao", "case_type": "upper"}

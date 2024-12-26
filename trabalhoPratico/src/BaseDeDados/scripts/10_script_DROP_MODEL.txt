@@ -45,6 +45,12 @@ DROP VIEW IF EXISTS v_cinematica_9;
 DROP VIEW IF EXISTS v_trajectoria_9;
 
 
+DROP VIEW IF EXISTS v_lagos;
+DROP VIEW IF EXISTS v_pantanos;
+DROP VIEW IF EXISTS v_cultivos;
+DROP VIEW IF EXISTS v_florestas;
+
+
 
 -- ========================================
 -- DROP FUNCTIONS
@@ -109,6 +115,7 @@ DROP FUNCTION IF EXISTS divisao_vector_por_escalar(t_vector,real);
 DROP TYPE IF EXISTS t_velocidade;
 DROP TYPE IF EXISTS t_aceleracao;
 DROP TYPE IF EXISTS t_vector;
+
 
 
 

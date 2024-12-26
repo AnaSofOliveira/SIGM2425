@@ -88,7 +88,9 @@ CREATE TABLE cinematica (
     id_cinematica INTEGER PRIMARY KEY, 
     orientacao REAL NOT NULL,
     velocidade t_velocidade NOT NULL,
+    velocidade_maxima t_velocidade NOT NULL,
     aceleracao t_aceleracao NOT NULL,
+    aceleracao_maxima t_aceleracao NOT NULL,
     boost real NOT NULL
 );
 
@@ -120,6 +122,8 @@ CREATE TABLE tipo_objeto_movel (
     nome VARCHAR(255) NOT NULL
 );
 
+SELECT AddGeometryColumn('public', 'tipo_objeto_movel', 'geo_corpo', 0, 'GEOMETRY', 2);
+
 ---------------------------------
 -- AFETACAO TIPO TERRENO - TIPO OBJETO MOVEL
 ---------------------------------
@@ -142,12 +146,9 @@ CREATE TABLE afetacao_tipo_terreno_tipo_objeto_movel (
 CREATE TABLE objeto_movel (
     id_objeto_movel INTEGER PRIMARY KEY,  
     nome VARCHAR(255) NOT NULL,
-    massa REAL NOT NULL,
     id_tipo_objeto_movel INTEGER,
     id_cinematica INTEGER NOT NULL,
     id_alvo INTEGER, 
     CONSTRAINT fk_tipo_objeto_movel FOREIGN KEY(id_tipo_objeto_movel) REFERENCES tipo_objeto_movel(id_tipo_objeto_movel),
     CONSTRAINT fk_cinematica FOREIGN KEY(id_cinematica) REFERENCES cinematica(id_cinematica)
 );
-
-SELECT AddGeometryColumn('public', 'objeto_movel', 'geo_corpo', 0, 'GEOMETRY', 2);
