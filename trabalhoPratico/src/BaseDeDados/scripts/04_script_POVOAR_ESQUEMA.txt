@@ -95,7 +95,7 @@ FROM terreno;
 ----------------------------
 
 INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome ) VALUES(1, 'Urso');
-INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome ) VALUES(2, 'Veado');
+INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome ) VALUES(2, 'Raposas');
 INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome ) VALUES(3, 'Lobo');
 INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome ) VALUES(4, 'Coelho');
 
@@ -116,9 +116,9 @@ VALUES(
     ST_GeomFromText('POINT(300 200)'),
     0.0, 
     ROW( ROW( 3, 3 ), 1.3 ),
-    ROW( ROW( 10, 10 ), 1.0 ),
+    ROW( ROW( 2, 2), 1.0 ),
     ROW( ROW( 5, 5 ), 1 ), 
-    ROW( ROW(5, 5), 1.0), 
+    ROW( ROW(2, 2), 1.0), 
     2
 );
 
@@ -129,35 +129,35 @@ VALUES(
     ST_GeomFromText('POINT(200 250)'),
     0.0, 
     ROW( ROW( 4, 2 ), 1.3 ), 
-    ROW( ROW( 10, 10 ), 1.0 ),
+    ROW( ROW( 2, 2), 1.0 ),
     ROW( ROW(2.5, 2.5 ), 1.0 ),
-    ROW( ROW(5, 5), 1.0), 
+    ROW( ROW(2, 2), 1.0), 
     0.1 
 );
 
--- Veado
+-- Raposas
 INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
 VALUES(
     3, 
     ST_GeomFromText('POINT(2500 300)'),
     0.0, 
     ROW( ROW( 4, 4 ), 1.3 ),
-    ROW( ROW( 10, 10 ), 1.0 ),
+    ROW( ROW( 2, 2), 1.0 ),
     ROW( ROW( 1.5, 1.5 ), 1.0 ), 
-    ROW( ROW(5, 5), 1.0), 
+    ROW( ROW(2, 2), 1.0), 
     3
 );
 
--- Veado
+-- Raposas
 INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
 VALUES(
     4,
     ST_GeomFromText('POINT(2500 3000)'),
     0.0, 
     ROW( ROW( 6, 6 ), 1.3 ),
-    ROW( ROW( 10, 10 ), 1.0 ),
+    ROW( ROW( 2, 2), 1.0 ),
     ROW( ROW( 2, 2 ), 1.0 ), 
-    ROW( ROW(5, 5), 1.0), 
+    ROW( ROW(2, 2), 1.0), 
     0.1 
 );
 
@@ -168,9 +168,9 @@ VALUES(
     ST_GeomFromText('POINT(2500 1800)'),
     0.0, 
     ROW( ROW( 10, 10 ), 1.3 ), 
-    ROW( ROW( 10, 10 ), 1.0 ),
+    ROW( ROW( 2, 2), 1.0 ),
     ROW( ROW( 5, 5 ), 1.0 ), 
-    ROW( ROW(5, 5), 1.0), 
+    ROW( ROW(2, 2), 1.0), 
     2
 );
 
@@ -181,9 +181,9 @@ VALUES(
     ST_GeomFromText('POINT(1200 800)'),
     0.0, 
     ROW( ROW( 7, 7 ), 1.3 ), 
-    ROW( ROW( 10, 10 ), 1.0 ),
+    ROW( ROW( 2, 2), 1.0 ),
     ROW( ROW( 4, 4 ), 1.0 ), 
-    ROW( ROW(5, 5), 1.0),  
+    ROW( ROW(2, 2), 1.0),  
     0.1 
 );
 
@@ -194,9 +194,9 @@ VALUES(
     ST_GeomFromText('POINT(400 800)'),
     0.0, 
     ROW( ROW( 2, 2 ), 1.3 ),
-    ROW( ROW( 10, 10 ), 1.0 ),
+    ROW( ROW( 2, 2), 1.0 ),
     ROW( ROW( 4, 4 ), 2.5 ), 
-    ROW( ROW(5, 5), 1.0), 
+    ROW( ROW(2, 2), 1.0), 
     1
 );
 
@@ -207,9 +207,9 @@ VALUES(
     ST_GeomFromText('POINT(2000 1000)'),
     0.0, 
     ROW( ROW( 3, 5 ), 1.3 ),
-    ROW( ROW( 10, 10 ), 1.0 ),
+    ROW( ROW( 2, 2), 1.0 ),
     ROW( ROW( 5, 5 ), 1.0 ), 
-    ROW( ROW(5, 5), 1.0), 
+    ROW( ROW(2, 2), 1.0), 
     0.1  
 );
 
@@ -220,9 +220,9 @@ VALUES(
     ST_GeomFromText('POINT(1000 1000)'), 
     0.0, 
     ROW( ROW( 5, 2 ), 1.3 ), 
-    ROW( ROW( 10, 10 ), 1.0 ),
+    ROW( ROW( 2, 2), 1.0 ),
     ROW( ROW( 7, 3 ), 1.0 ), 
-    ROW( ROW(5, 5), 1.0), 
+    ROW( ROW(2, 2), 1.0), 
     0.1 
 );
 
@@ -239,12 +239,12 @@ VALUES(1, 'Urso 1', 1, 1, 7);
 INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
 VALUES(2, 'Urso 2', 1, 2);
 
--- Veado
+-- Raposas
 INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica, id_alvo) 
-VALUES(3, 'Veado 1', 2, 3, 8);
--- Veado
+VALUES(3, 'Raposas 1', 2, 3, 8);
+-- Raposas
 INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
-VALUES(4, 'Veado 2', 2, 4);
+VALUES(4, 'Raposas 2', 2, 4);
 
 -- Lobo
 INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica, id_alvo) 
@@ -285,13 +285,13 @@ INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_ob
 -- Urso-Cultivo
 INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(4, 1, 0.12);
 
--- Veado-Lago
+-- Raposas-Lago
 INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(1, 2, 0.06);
--- Veado-Floresta
+-- Raposas-Floresta
 INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(2, 2, 0.05);
--- Veado-Pantano
+-- Raposas-Pantano
 INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(3, 2, 0.2);
--- Veado-Cultivo
+-- Raposas-Cultivo
 INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(4, 2, 0.12);
 
 -- Lobo-Lago

@@ -27,25 +27,25 @@
 DO
 $$
 DECLARE
-    nIteracoes INT := 30;  -- Número de iterações
+    nIteracoes INT := 100;  -- Número de iterações
     count INT := 0;
 BEGIN
     WHILE count < nIteracoes LOOP
 
-        -- (A)
+        -- (A) UPDATE HISTORICO
         INSERT INTO cinematica_hist
         SELECT nextval('cinematica_hist_id_cinematica_hist_seq'), id_cinematica, orientacao, velocidade, aceleracao, boost, geo_ponto
         FROM cinematica;
 
 
-        -- (B) Predador a perseguir a presa
+        -- (B) UPDATE VALORES REAL TIME 
         UPDATE cinematica
         SET aceleracao = obter_aceleracao( objeto_movel.id_objeto_movel, objeto_movel.id_alvo, cinematica.boost, obter_terreno( cinematica.geo_ponto ) )  
         FROM objeto_movel
         WHERE objeto_movel.id_cinematica = cinematica.id_cinematica;
 
         UPDATE cinematica
-        SET velocidade = novo_velocidade( cinematica.velocidade, cinematica.aceleracao, 1 )
+        SET velocidade = novo_velocidade( cinematica.velocidade, cinematica.aceleracao, 1, cinematica.velocidade_maxima )
         FROM objeto_movel
         WHERE objeto_movel.id_cinematica = cinematica.id_cinematica;
 
