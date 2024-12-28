@@ -119,9 +119,7 @@ def plot_trajectory_and_kinematics(selected_objects, canvas, ax):
         posicao_df = load_view_data(kin_view, 'g_posicao')
         pos = posicao_df['g_posicao'][0]
         if not corpo_df.empty and corpo_df.geometry.is_valid.all():
-            print("Cinemáticas:\n", corpo_df)
             corpo_df.plot(ax=ax, color='black', label=f'Kinematics {obj_id}', aspect=1)
-            print("Posição:\n", pos.x, type(pos), type(pos.x))
             ax.text(pos.x+20, pos.y+20, f'({round(pos.x, 2)}, {round(pos.y, 2)})', fontsize=8, ha='center')
 
     print("Drawing canvas")
