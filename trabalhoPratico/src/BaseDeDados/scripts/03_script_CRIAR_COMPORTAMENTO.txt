@@ -278,3 +278,65 @@ FROM objeto_movel
 left join cinematica on objeto_movel.id_cinematica = cinematica.id_cinematica
 -- where objeto_movel.id_objeto_movel = 1
 ;
+
+----------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION centrar_forma2D(
+    pontos GEOMETRY,
+    novo_centro GEOMETRY,
+    fator_escala DOUBLE PRECISION DEFAULT 1.0
+) RETURNS GEOMETRY AS $$
+DECLARE
+    centroide_atual GEOMETRY;
+    forma_escalada GEOMETRY;
+    forma_final GEOMETRY;
+BEGIN
+
+    -- Aplica a escala em torno do centroide atual
+    forma_escalada := ST_Scale(
+        pontos, 
+        fator_escala, fator_escala, fator_escala
+    );
+
+    RAISE NOTICE 'Forma escalada: %', ST_AsText(forma_escalada);
+
+    -- Calcula o centroide da forma
+    centroide_atual := ST_Centroid(forma_escalada);
+
+    RAISE NOTICE 'Centroide forma escala: %', ST_AsText(centroide_atual);
+
+    -- Calcula o vetor de translação diretamente do centroide escalado
+    forma_final := ST_Translate(
+        forma_escalada, 
+        ST_X(novo_centro) - ST_X(centroide_atual),
+        ST_Y(novo_centro) - ST_Y(centroide_atual)
+    );
+
+    RETURN forma_final;
+END;
+$$ LANGUAGE plpgsql;
+
+
+\echo -> Testes centrar_forma2D (sem fator de escala)
+WITH formas as (
+    SELECT ST_GeomFromText('POLYGON ((0 0, 0 100, 100 100, 100 0, 0 0))') as poligono
+)
+
+SELECT 
+    ST_AsText(ST_MakePoint(500, 500)) as ponto, 
+    ST_AsText(poligono) as forma, 
+    ST_AsText(ST_Centroid(poligono)) as centroid_inicial, 
+    ST_AsText(centrar_forma2D(poligono, ST_MakePoint(500, 500))) as novas_coordenadas_forma
+from formas;
+
+
+\echo -> Testes centrar_forma2D (com fator de escala)
+WITH formas as (
+    SELECT ST_GeomFromText('POLYGON ((0 0, 0 100, 100 100, 100 0, 0 0))') as poligono
+)
+SELECT 
+    ST_AsText(ST_MakePoint(500, 500)) as ponto, 
+    ST_AsText(poligono) as forma, 
+    2 as fator_escala,
+    ST_AsText(centrar_forma2D(poligono, ST_MakePoint(500, 500), 2)) as novas_coordenadas_forma
+from formas;

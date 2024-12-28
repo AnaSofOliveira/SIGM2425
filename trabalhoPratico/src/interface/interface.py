@@ -104,14 +104,6 @@ def plot_trajectory_and_kinematics(selected_objects, canvas, ax):
 
     for obj_id in selected_objects:
 
-        # Plotar cinemática
-        print("Plotting kinematics")
-        kin_view = f"v_cinematica_{obj_id}"
-        kin_df = load_view_data(kin_view, 'g_posicao')
-        if not kin_df.empty:
-            print("Cinemáticas:\n", kin_df)
-            kin_df.plot(ax=ax, color='blue', label=f'Kinematics {obj_id}', aspect=1)
-
         # Plotar trajetória
         print("Plotting trajectory")
         traj_view = f"v_trajectoria_{obj_id}"
@@ -119,6 +111,18 @@ def plot_trajectory_and_kinematics(selected_objects, canvas, ax):
         if not traj_df.empty:
             print("Trajetórias:\n", traj_df)
             traj_df.plot(ax=ax, color='red', label=f'Trajectory {obj_id}', aspect=1)
+
+        # Plotar cinemática
+        print("Plotting kinematics")
+        kin_view = f"v_cinematica_{obj_id}"
+        corpo_df = load_view_data(kin_view, 'geo_corpo')
+        posicao_df = load_view_data(kin_view, 'g_posicao')
+        pos = posicao_df['g_posicao'][0]
+        if not corpo_df.empty and corpo_df.geometry.is_valid.all():
+            print("Cinemáticas:\n", corpo_df)
+            corpo_df.plot(ax=ax, color='black', label=f'Kinematics {obj_id}', aspect=1)
+            print("Posição:\n", pos.x, type(pos), type(pos.x))
+            ax.text(pos.x+20, pos.y+20, f'({round(pos.x, 2)}, {round(pos.y, 2)})', fontsize=8, ha='center')
 
     print("Drawing canvas")
     canvas.draw()
