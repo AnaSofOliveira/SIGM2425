@@ -73,6 +73,12 @@ class PostGis(Database):
         gdf = gdf[gdf.geometry.apply(lambda geom: np.all(np.isfinite(geom.bounds)))]
         
         return gdf
+    
+    def simular_perseguicao(self, num_iteracoes):
+        query = f"SELECT simular_perseguicao({num_iteracoes})"
+        self.read_sql(query)
+        query = "SELECT criar_views_objetos()"
+        self.read_sql(query)
 
     def get_view(self, view_name, geom_col):
         query = f"SELECT * FROM {view_name}"
@@ -83,3 +89,4 @@ class PostGis(Database):
         query = "select obj.id_objeto_movel as id, tipo_obj.nome as nome from objeto_movel as obj left join tipo_objeto_movel as tipo_obj on obj.id_tipo_objeto_movel = tipo_obj.id_tipo_objeto_movel"
         df = self.read_sql(query)
         return df
+    

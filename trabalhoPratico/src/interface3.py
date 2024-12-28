@@ -69,8 +69,8 @@ class ControllerGui:
     
 
     def plot_terrain(self, frame_or_ax):
-        fig, ax = plt.subplots(figsize=(6, 10)) if isinstance(frame_or_ax, tk.Frame) else (None, frame_or_ax)
-
+        fig, ax = plt.subplots(figsize=(20, 20)) if isinstance(frame_or_ax, tk.Frame) else (None, frame_or_ax)
+        
         # Carregar dados das vistas e definir cores específicas
         views = {
             'v_florestas': '#228B22',  # fresh green
@@ -101,14 +101,6 @@ class ControllerGui:
 
         for obj_id in selected_objects:
 
-            # Plotar cinemática
-            print("Plotting kinematics")
-            kin_view = f"v_cinematica_{obj_id}"
-            kin_df = self.load_view_data(kin_view, 'g_posicao')
-            if not kin_df.empty:
-                print("Cinemáticas:\n", kin_df)
-                kin_df.plot(ax=ax, color='blue', label=f'Kinematics {obj_id}', aspect=1)
-
             # Plotar trajetória
             print("Plotting trajectory")
             traj_view = f"v_trajectoria_{obj_id}"
@@ -116,22 +108,34 @@ class ControllerGui:
             if not traj_df.empty:
                 print("Trajetórias:\n", traj_df)
                 traj_df.plot(ax=ax, color='red', label=f'Trajectory {obj_id}', aspect=1)
+            
+            # Plotar cinemática
+            print("Plotting kinematics")
+            kin_view = f"v_cinematica_{obj_id}"
+            corpo_df = self.load_view_data(kin_view, 'geo_corpo')
+            posicao_df = self.load_view_data(kin_view, 'g_posicao')
+            pos = posicao_df['g_posicao'][0]
+            if not corpo_df.empty and corpo_df.geometry.is_valid.all():
+                corpo_df.plot(ax=ax, color='black', label=f'Kinematics {obj_id}', aspect=1)
+                ax.text(pos.x+20, pos.y+20, f'({round(pos.x, 2)}, {round(pos.y, 2)})', fontsize=8, ha='center')
 
-        print("Drawing canvas")
+
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)
 
     def update_plot(self, frame):
         self.clear_plots(frame)
-        fig, ax = plt.subplots(figsize=(6, 10))
+        fig, ax = plt.subplots(figsize=(10, 10))
         canvas = FigureCanvasTkAgg(fig, master=frame)
         self.plot_trajectory_and_kinematics(self.selected_objects, canvas, ax)
         ax.set_xticks([])  # Remover valores do eixo x
         ax.set_yticks([])  # Remover valores do eixo y
         self.zoom_controller.setup_zoom_and_drag(canvas, ax)
 
-    def on_submit(self, ni):
+    def on_submit(self, ni, frame):
         print("Atualizando gráfico", ni)
+        self.db.simular_perseguicao(ni)
+        self.update_plot(frame)
 
     def load_object_types(self):
         return self.db.get_objetos_types()
@@ -187,7 +191,7 @@ class GUI:
             chk.pack(anchor='w', padx=16)
 
 
-        submit_button = tk.Button(frame, text="Atualizar", command=lambda : self.controller.on_submit(text_input.get()), font=('Arial', 12))
+        submit_button = tk.Button(frame, text="Atualizar", command=lambda : self.controller.on_submit(text_input.get(),self.graph_frame), font=('Arial', 12))
         submit_button.pack(pady=16, side=tk.BOTTOM)
 
         text_input = tk.Entry(frame, font=('Arial', 12))
