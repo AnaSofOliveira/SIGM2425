@@ -28,6 +28,9 @@ DROP FUNCTION IF EXISTS novo_velocidade( t_velocidade, t_aceleracao, real , t_ve
 
 drop function if exists obter_aceleracao( int, int, real, int );
 drop function if exists novo_aceleracao_linear;
+drop function if exists centrar_forma2D(GEOMETRY, GEOMETRY, DOUBLE);
+drop function if exists simular_perseguicao(INT);
+drop function if exists criar_views_objetos;
 
 DROP VIEW IF EXISTS v_novo_cinematica;
 ----------------------------------------------------------
@@ -340,3 +343,84 @@ SELECT
     2 as fator_escala,
     ST_AsText(centrar_forma2D(poligono, ST_MakePoint(500, 500), 2)) as novas_coordenadas_forma
 from formas;
+
+----------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION simular_perseguicao(nIteracoes INT)
+RETURNS VOID AS
+$$
+DECLARE
+    count INT := 0;
+BEGIN
+    WHILE count < nIteracoes LOOP
+        -- (A) UPDATE HISTORICO
+        INSERT INTO cinematica_hist
+        SELECT nextval('cinematica_hist_id_cinematica_hist_seq'), id_cinematica, orientacao, velocidade, aceleracao, boost, geo_ponto
+        FROM cinematica;
+
+        -- (B) UPDATE VALORES REAL TIME 
+        UPDATE cinematica
+        SET aceleracao = obter_aceleracao(objeto_movel.id_objeto_movel, objeto_movel.id_alvo, cinematica.boost, obter_terreno(cinematica.geo_ponto))
+        FROM objeto_movel
+        WHERE objeto_movel.id_cinematica = cinematica.id_cinematica;
+
+        UPDATE cinematica
+        SET velocidade = novo_velocidade(cinematica.velocidade, cinematica.aceleracao, 1, cinematica.velocidade_maxima)
+        FROM objeto_movel
+        WHERE objeto_movel.id_cinematica = cinematica.id_cinematica;
+
+        UPDATE cinematica
+        SET geo_ponto = novo_posicao(cinematica.geo_ponto, cinematica.velocidade, 1)
+        FROM objeto_movel
+        WHERE objeto_movel.id_cinematica = cinematica.id_cinematica;
+
+        UPDATE cinematica
+        SET orientacao = novo_orientacao(cinematica.orientacao, cinematica.velocidade, 1)
+        FROM objeto_movel
+        WHERE objeto_movel.id_cinematica = cinematica.id_cinematica;
+
+        -- Incrementar o count
+        count := count + 1;
+    END LOOP;
+END
+$$ LANGUAGE plpgsql;
+
+----------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION criar_views_objetos() RETURNS boolean AS $$
+DECLARE 
+    rec RECORD;
+    all_success boolean := true;
+BEGIN 
+    FOR rec IN (SELECT id_objeto_movel FROM objeto_movel) LOOP
+        BEGIN
+            EXECUTE format('
+                CREATE OR REPLACE VIEW v_trajectoria_%s AS
+                SELECT 
+                    cinematica_hist.*, 
+                    cinematica_hist.geo_ponto as g_posicao, 
+                    objeto_movel.id_objeto_movel as id, 
+                    tipo_objeto_movel.nome as tipo
+                FROM objeto_movel
+                    LEFT JOIN cinematica_hist ON objeto_movel.id_cinematica = cinematica_hist.id_cinematica 
+                    LEFT JOIN tipo_objeto_movel ON objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel
+                WHERE objeto_movel.id_objeto_movel = %s;', rec.id_objeto_movel, rec.id_objeto_movel, rec.id_objeto_movel);
+
+            EXECUTE format('
+                CREATE OR REPLACE VIEW v_cinematica_%s AS
+                SELECT 
+                    cinematica.*, 
+                    cinematica.geo_ponto as g_posicao,
+                    tipo_objeto_movel.nome as nome_objeto_movel,
+                    centrar_forma2D(tipo_objeto_movel.geo_corpo, cinematica.geo_ponto, 20) as geo_corpo
+                FROM objeto_movel
+                    LEFT JOIN cinematica ON objeto_movel.id_cinematica = cinematica.id_cinematica
+                    LEFT JOIN tipo_objeto_movel ON objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel 
+                WHERE objeto_movel.id_objeto_movel = %s;', rec.id_objeto_movel, rec.id_objeto_movel, rec.id_objeto_movel);
+        EXCEPTION
+            WHEN OTHERS THEN
+                all_success := false;
+        END;
+    END LOOP;
+    RETURN all_success;
+END $$ LANGUAGE plpgsql;
