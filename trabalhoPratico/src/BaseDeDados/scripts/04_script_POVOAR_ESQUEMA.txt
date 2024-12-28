@@ -95,16 +95,16 @@ FROM terreno;
 ----------------------------
 
 INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome, geo_corpo ) VALUES(1, 'Urso', 
-ST_MakePolygon( ST_GeomFromText('LINESTRING(0 0, 0 100, 100 100, 100 0, 0 0)'))
+ST_MakePolygon( ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1, 1 0, 0 0)'))
 );
 INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome, geo_corpo ) VALUES(2, 'Raposa', 
-ST_MakePolygon( ST_GeomFromText('LINESTRING(0 0, 50 100, 100 0, 0 0)'))
+ST_MakePolygon( ST_GeomFromText('LINESTRING(0 0, 0.5 1, 1 0, 0 0)'))
 );
 INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome, geo_corpo ) VALUES(3, 'Lobo',
-ST_MakePolygon( ST_GeomFromText('LINESTRING(25 0, 0 50, 25 100, 75 100, 100 50, 75 0, 25 0)'))
+ST_MakePolygon( ST_GeomFromText('LINESTRING(0.25 0, 0 0.5, 0.25 1, 0.75 1, 1 0.5, 0.75 0, 0.25 0)'))
 );
 INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome, geo_corpo ) VALUES(4, 'Coelho', 
-ST_MakePolygon( ST_GeomFromText('LINESTRING(50 0, 0 50, 50 100, 100 50, 50 0)'))
+ST_MakePolygon( ST_GeomFromText('LINESTRING(0.5 0, 0 0.5, 0.5 1, 1 0.5, 0.5 0)'))
 );
 
 \echo -> Tipos de Objetos Moveis:
