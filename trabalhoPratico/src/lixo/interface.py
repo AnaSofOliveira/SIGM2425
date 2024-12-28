@@ -42,6 +42,21 @@ def load_view_data(view_name, geom_col):
     
     return gdf
 
+# Função para atualizar a coluna g_posicao na tabela chats
+def update_g_posicao():
+    engine = connect_db()
+    with engine.connect() as connection:
+        update_query = """
+        UPDATE chats
+        SET g_posicao = ST_Translate(v.geo_corpo_objeto_movel, 
+                                     ST_X(g_posicao) - ST_X(v.centroide_objeto_movel), 
+                                     ST_Y(g_posicao) - ST_Y(v.centroide_objeto_movel))
+        FROM v_cinematica_x v
+        WHERE chats.object_id = v.object_id;
+        """
+        connection.execute(update_query)
+        print("g_posicao column updated successfully.")
+
 # Função para plotar os dados fixos
 def plot_fixed_data(ax):
     fixed_views = ["terreno"]
@@ -58,7 +73,7 @@ def plot_selected_data(ax, selected_views):
 # Função para atualizar a visualização
 def update_plot():
     selected_views = []
-    for view_name, var, title in checkbox_order:
+    for view_name, var, title in view_vars:
         if var.get():
             selected_views.append((view_name, title))
     
@@ -70,17 +85,9 @@ def update_plot():
     ax.legend(handles, labels)
     canvas.draw()
 
-# Função para lidar com o clique no checkbox
-def on_checkbox_click(view_name, var, title):
-    if var.get():
-        checkbox_order.append((view_name, var, title))
-    else:
-        checkbox_order.remove((view_name, var, title))
-    update_plot()
-
 # Função para criar a interface gráfica
 def create_gui():
-    global root, canvas, ax, view_vars, checkbox_order
+    global root, canvas, ax, view_vars
     root = tk.Tk()
     root.title("Visualização de Dados Geoespaciais")
 
@@ -96,15 +103,13 @@ def create_gui():
     frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
     view_vars = []
-    checkbox_order = []
 
     # Checkboxes para as views de trajetórias
     for i in range(1, 10):
         view_name = f"v_trajectoria_{i}"
         title = f"Trajetória {i}"
         var = tk.BooleanVar()
-        checkbox = ttk.Checkbutton(frame, text=title, variable=var, 
-                                   command=lambda vn=view_name, v=var, t=title: on_checkbox_click(vn, v, t))
+        checkbox = ttk.Checkbutton(frame, text=title, variable=var, command=update_plot)
         checkbox.grid(row=i, column=0, padx=5, pady=5)
         view_vars.append((view_name, var, title))
 
@@ -113,8 +118,7 @@ def create_gui():
         view_name = f"v_cinematica_{i}"
         title = f"Cinemática {i}"
         var = tk.BooleanVar()
-        checkbox = ttk.Checkbutton(frame, text=title, variable=var, 
-                                   command=lambda vn=view_name, v=var, t=title: on_checkbox_click(vn, v, t))
+        checkbox = ttk.Checkbutton(frame, text=title, variable=var, command=update_plot)
         checkbox.grid(row=i, column=1, padx=5, pady=5)
         view_vars.append((view_name, var, title))
 
@@ -137,6 +141,7 @@ def create_gui():
     canvas.draw()
 
     root.mainloop()
+    
 
 # Executar a interface gráfica
 if __name__ == "__main__":
