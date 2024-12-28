@@ -1,0 +1,89 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+
+--================
+-- Actualizar Cliente
+--================
+
+UPDATE Cliente
+SET local = ST_GeomFromText('POINT(10 20)', 0)
+WHERE codigo=15;
+
+UPDATE Cliente
+SET local = ST_GeomFromText('POINT(30 20)', 0)
+WHERE codigo=2;
+
+UPDATE Cliente
+SET local = ST_GeomFromText('POINT(30 40)', 0)
+WHERE codigo=333;
+
+
+
+--================
+-- Actualizar Infantario
+--================
+
+UPDATE Infantario
+SET local = ST_GeomFromText('POINT(40 10)', 0)
+WHERE nome='Fraldas';
+
+UPDATE Infantario
+SET local = ST_GeomFromText('POINT(20 30)', 0)
+WHERE nome='Ursinho';
+
+UPDATE Infantario
+SET local = ST_GeomFromText('POINT(30 30)', 0)
+WHERE nome='Pinoquio';
+
+
+
+--============
+-- Povoar <ER>
+--============
+
+INSERT INTO Freguesia (nome, lucro, local)
+VALUES 
+(
+    'Lumiar',
+    3,
+    ST_GeomFromText('POLYGON((10.00 10.00, 10.00 40.00, 20.00 30.00, 10.00 10.00))',0)
+)
+,
+(
+    'Alvalade',
+    2,
+    ST_GeomFromText('POLYGON((20.00 30.00, 50.00 20.00, 50.00 40.00, 10.00 50.00, 10.00 40.00, 20.00 30.00))',0)
+),
+(
+    'Olivais',
+    1,
+    ST_GeomFromText('POLYGON((20.00 30.00, 50.00 20.00, 50.00 00.00, 10.00 00.00, 10.00 10.00, 20.00 30.00))',0)
+)
+;
+
+UPDATE Freguesia
+SET local = ST_GeomFromText('POLYGON((9.00 9.00, 10.00 40.00, 25.00 30.00, 15.00 15.00, 9.00 9.00))', 0)
+WHERE nome='Lumiar';
+
+
+
+

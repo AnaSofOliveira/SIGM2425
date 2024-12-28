@@ -1,0 +1,153 @@
+--#############
+--# GRUPO 04
+--# OCT.2016
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+--___________________________________________________________
+-- \connect (or \c) [ dbname [ username ] [ host ] [ port ] ]
+-- (cf. postgresql-9.4-A4.pdf)
+--___________________________________________________________
+\connect :dataBase :userName
+;
+--==========================
+-- NOTA: completar em <XX>
+--==========================
+
+----------------------------------------------
+-- Criar Esquemas de Relacao
+-- (que derivem de Entidades e de Associacoes)
+----------------------------------------------
+
+-- Esquema de Relacao Cliente
+CREATE TABLE Cliente
+(
+	codigo INT PRIMARY KEY,
+	bi INT NOT NULL,
+	nomeProprio VARCHAR(25) NOT NULL,
+	apelido VARCHAR(25) NOT NULL
+);
+
+
+;
+-- Esquema de Relacao Filho
+CREATE TABLE Filho (
+    bi INT PRIMARY KEY,
+    nomeProprio VARCHAR(25), 
+    dataNascimento DATE
+);
+
+
+;
+-- Esquema de Relacao Infantario
+CREATE TABLE Infantario (
+    nome VARCHAR(100) PRIMARY KEY
+);
+
+
+
+---------------------------------------------
+-- Criar Atributos que derivem de Associacoes
+---------------------------------------------
+
+-- Associacao: Cliente - Filho
+ALTER TABLE Filho ADD fk_cliente INT;
+
+
+-- Associacao: Infantario - Filho
+ALTER TABLE Filho ADD fk_infantario VARCHAR(25);
+
+
+
+
+-------------------------------------------------
+-- Criar as Restricoes de Integridade de Entidade
+-------------------------------------------------
+
+-- Cliente
+--========
+-- ALTER TABLE Cliente
+-- ADD CONSTRAINT pk_cliente
+--    PRIMARY KEY(codigo);
+
+-- ALTER TABLE <ER>
+-- ADD CONSTRAINT ak1_<ER>
+--    UNIQUE( ...
+;
+
+
+-- Filho
+--========
+-- ALTER TABLE Filho
+-- ADD CONSTRAINT pk_filho
+--    PRIMARY KEY(bi);
+
+-- ALTER TABLE <ER>
+-- ADD CONSTRAINT ak1_<ER>
+--    UNIQUE( ...
+;
+
+
+-- Infantario
+--========
+-- ALTER TABLE Infantario
+-- ADD CONSTRAINT fk_infantario
+--    PRIMARY KEY(nome);
+
+-- ALTER TABLE <ER>
+-- ADD CONSTRAINT ak1_<ER>
+--    UNIQUE( ...
+;
+
+
+-- ...
+
+
+
+
+-------------------------------------------------
+-- Criar as Restricoes de Integridade Referencial
+-------------------------------------------------
+
+-- Filho
+--========
+ALTER TABLE Filho
+ ADD CONSTRAINT fk_cliente
+    FOREIGN KEY(fk_cliente)
+    REFERENCES Cliente(codigo);
+
+ALTER TABLE Filho
+ ADD CONSTRAINT fk_infantario
+    FOREIGN KEY(fk_infantario)
+    REFERENCES Infantario(nome);
+
+
+-- <ER>
+--========
+-- ALTER TABLE <ER>
+-- ADD CONSTRAINT fk1_<ER>
+--    FOREIGN KEY( ...
+--    REFERENCES ...
+--    ON DELETE ...
+;
+
+
+-- <ER>
+--========
+-- ALTER TABLE <ER>
+-- ADD CONSTRAINT fk1_<ER>
+--    FOREIGN KEY( ...
+--    REFERENCES ...
+--    ON DELETE ...
+
+
+-- ...
+
+
+
+

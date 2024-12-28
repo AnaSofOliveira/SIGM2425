@@ -1,0 +1,378 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase fuga_selvagem
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+-- Eliminar Dados (anteriores)
+--=============================
+
+DELETE FROM AFETACAO_TIPO_TERRENO_TIPO_OBJETO_MOVEL;
+DELETE FROM TERRENO;
+DELETE FROM TIPO_TERRENO;
+
+DELETE FROM OBJETO_MOVEL; 
+DELETE FROM CINEMATICA; 
+DELETE FROM TIPO_OBJETO_MOVEL;
+
+DELETE FROM CINEMATICA_HIST;
+---------------------------------
+
+
+----------------------------
+-- Povoar Dados
+----------------------------
+-- TIPO_TERRENO
+----------------------------
+INSERT INTO tipo_terreno( id_tipo_terreno, nome ) VALUES(1, 'Lago' ); 
+INSERT INTO tipo_terreno( id_tipo_terreno, nome ) VALUES(2, 'Floresta' ); 
+INSERT INTO tipo_terreno( id_tipo_terreno, nome ) VALUES(3, 'Pantano' ); 
+INSERT INTO tipo_terreno( id_tipo_terreno, nome ) VALUES(4, 'Cultivo' );
+
+\echo -> Tipos de Terrenos:
+SELECT 
+    id_tipo_terreno as "Tipo de Terreno", 
+    nome as "Nome do Terreno"
+FROM tipo_terreno;
+
+
+----------------------------
+-- TERRENO
+----------------------------
+
+-- Floresta
+INSERT INTO terreno( id_terreno, id_tipo_terreno, geo_terreno, z_index ) 
+VALUES( 3, 2, ST_MakePolygon( ST_GeomFromText('LINESTRING(100 300,300 100,700 100,1100 300,1700 100,2400 200,3000 500,3300 1100,3300 1600,2500 1900,1800 1900,1100 1700,600 1100,100 900,100 300)')), 1
+); 
+
+-- Lago
+INSERT INTO terreno( id_terreno, id_tipo_terreno, geo_terreno, z_index  ) 
+VALUES( 1, 1, ST_MakePolygon( ST_GeomFromText('LINESTRING(300 600,500 300,800 300,1000 500,800 700,500 800,300 600)')), 2
+); 
+
+-- Lago
+INSERT INTO terreno( id_terreno, id_tipo_terreno, geo_terreno, z_index  ) 
+VALUES( 2, 1, ST_MakePolygon( ST_GeomFromText('LINESTRING(2400 800,2500 500,2800 500,2700 700,3000 800,2700 1100,2500 1000,2400 800)')), 2
+); 
+
+-- Pantano
+INSERT INTO terreno( id_terreno, id_tipo_terreno, geo_terreno, z_index  ) 
+VALUES( 4, 3, ST_MakePolygon( ST_GeomFromText('LINESTRING(1800 1100,1900 900,2300 700,2400 1100,2100 1200,1800 1100)')), 2
+);
+
+-- Cultivo
+INSERT INTO terreno( id_terreno, id_tipo_terreno, geo_terreno, z_index  ) 
+VALUES( 5, 4, ST_MakePolygon( ST_GeomFromText('LINESTRING(1300 600,1400 300,1700 200,2300 400,2300 600,2100 700,1800 800,1400 1000,1300 600)')), 2
+);
+
+-- Cultivo
+INSERT INTO terreno( id_terreno, id_tipo_terreno, geo_terreno, z_index  ) 
+VALUES( 6, 4, ST_MakePolygon( ST_GeomFromText('LINESTRING(2200 1500,2300 1200,2600 1100,3200 1300,3200 1500,3000 1600,2700 1700,2300 1800,2200 1500)')), 2
+);
+
+
+\echo -> Terrenos:
+SELECT 
+    id_terreno as "ID do Terreno", 
+    id_tipo_terreno as "Tipo de Terreno", 
+    ST_AsText( geo_terreno ) as "Geometria do Terreno"
+FROM terreno;
+
+----------------------------
+-- TIPO_OBJETO_MOVEL
+----------------------------
+
+INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome, geo_corpo ) VALUES(1, 'Urso', 
+ST_MakePolygon( ST_GeomFromText('LINESTRING(0 0, 0 100, 100 100, 100 0, 0 0)'))
+);
+INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome, geo_corpo ) VALUES(2, 'Raposa', 
+ST_MakePolygon( ST_GeomFromText('LINESTRING(0 0, 50 100, 100 0, 0 0)'))
+);
+INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome, geo_corpo ) VALUES(3, 'Lobo',
+ST_MakePolygon( ST_GeomFromText('LINESTRING(25 0, 0 50, 25 100, 75 100, 100 50, 75 0, 25 0)'))
+);
+INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome, geo_corpo ) VALUES(4, 'Coelho', 
+ST_MakePolygon( ST_GeomFromText('LINESTRING(50 0, 0 50, 50 100, 100 50, 50 0)'))
+);
+
+\echo -> Tipos de Objetos Moveis:
+SELECT 
+    id_tipo_objeto_movel as "ID do Tipo de Objeto Movel", 
+    nome as "Nome do Objeto Movel"
+FROM tipo_objeto_movel;
+
+----------------------------
+-- CINEMATICA
+----------------------------
+
+-- Urso
+INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
+VALUES(
+    1, 
+    ST_GeomFromText('POINT(300 200)'),
+    0.0, 
+    ROW( ROW( 3, 3 ), 1.3 ),
+    ROW( ROW( 2, 2), 1.0 ),
+    ROW( ROW( 5, 5 ), 1 ), 
+    ROW( ROW(2, 2), 1.0), 
+    2
+);
+
+-- Urso
+INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
+VALUES(
+    2, 
+    ST_GeomFromText('POINT(200 250)'),
+    0.0, 
+    ROW( ROW( 4, 2 ), 1.3 ), 
+    ROW( ROW( 2, 2), 1.0 ),
+    ROW( ROW(2.5, 2.5 ), 1.0 ),
+    ROW( ROW(2, 2), 1.0), 
+    0.1 
+);
+
+-- Raposa
+INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
+VALUES(
+    3, 
+    ST_GeomFromText('POINT(2500 300)'),
+    0.0, 
+    ROW( ROW( 4, 4 ), 1.3 ),
+    ROW( ROW( 2, 2), 1.0 ),
+    ROW( ROW( 1.5, 1.5 ), 1.0 ), 
+    ROW( ROW(2, 2), 1.0), 
+    3
+);
+
+-- Raposa
+INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
+VALUES(
+    4,
+    ST_GeomFromText('POINT(2500 3000)'),
+    0.0, 
+    ROW( ROW( 6, 6 ), 1.3 ),
+    ROW( ROW( 2, 2), 1.0 ),
+    ROW( ROW( 2, 2 ), 1.0 ), 
+    ROW( ROW(2, 2), 1.0), 
+    0.1 
+);
+
+-- Lobo
+INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
+VALUES(
+    5,
+    ST_GeomFromText('POINT(2500 1800)'),
+    0.0, 
+    ROW( ROW( 10, 10 ), 1.3 ), 
+    ROW( ROW( 2, 2), 1.0 ),
+    ROW( ROW( 5, 5 ), 1.0 ), 
+    ROW( ROW(2, 2), 1.0), 
+    2
+);
+
+-- Lobo
+INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
+VALUES(
+    6, 
+    ST_GeomFromText('POINT(1200 800)'),
+    0.0, 
+    ROW( ROW( 7, 7 ), 1.3 ), 
+    ROW( ROW( 2, 2), 1.0 ),
+    ROW( ROW( 4, 4 ), 1.0 ), 
+    ROW( ROW(2, 2), 1.0),  
+    0.1 
+);
+
+-- Coelho
+INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
+VALUES(
+    7, 
+    ST_GeomFromText('POINT(400 800)'),
+    0.0, 
+    ROW( ROW( 2, 2 ), 1.3 ),
+    ROW( ROW( 2, 2), 1.0 ),
+    ROW( ROW( 4, 4 ), 2.5 ), 
+    ROW( ROW(2, 2), 1.0), 
+    1
+);
+
+-- Coelho
+INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
+VALUES(
+    8, 
+    ST_GeomFromText('POINT(2000 1000)'),
+    0.0, 
+    ROW( ROW( 3, 5 ), 1.3 ),
+    ROW( ROW( 2, 2), 1.0 ),
+    ROW( ROW( 5, 5 ), 1.0 ), 
+    ROW( ROW(2, 2), 1.0), 
+    0.1  
+);
+
+-- Coelho
+INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
+VALUES(
+    9, 
+    ST_GeomFromText('POINT(1000 1000)'), 
+    0.0, 
+    ROW( ROW( 5, 2 ), 1.3 ), 
+    ROW( ROW( 2, 2), 1.0 ),
+    ROW( ROW( 7, 3 ), 1.0 ), 
+    ROW( ROW(2, 2), 1.0), 
+    0.1 
+);
+
+
+
+----------------------------
+-- OBJETO_MOVEL
+----------------------------
+
+-- Urso
+INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica, id_alvo) 
+VALUES(1, 'Urso 1', 1, 1, 7);
+-- Urso
+INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
+VALUES(2, 'Urso 2', 1, 2);
+
+-- Raposa
+INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica, id_alvo) 
+VALUES(3, 'Raposa 1', 2, 3, 8);
+-- Raposa
+INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
+VALUES(4, 'Raposa 2', 2, 4);
+
+-- Lobo
+INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica, id_alvo) 
+VALUES(5, 'Lobo 1', 3, 5, 9);
+-- Lobo
+INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
+VALUES(6, 'Lobo 2', 3, 6);
+
+-- Coelho
+INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
+VALUES(7, 'Coelho 1', 4, 7);
+-- Coelho
+INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
+VALUES(8, 'Coelho 2', 4, 8);
+-- Coelho
+INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
+VALUES(9, 'Coelho 3', 4, 9);
+
+
+\echo -> Objetos Moveis:
+SELECT 
+    objeto_movel.id_objeto_movel as "ID do Objeto Movel", 
+    objeto_movel.nome as "Nome do Objeto Movel",
+    tipo_objeto_movel.nome as "Tipo do Objeto Movel"
+FROM objeto_movel
+LEFT JOIN tipo_objeto_movel ON objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel;
+
+----------------------------
+-- AFETACAO_TIPO_TERRENO_TIPO_OBJETO_MOVEL 
+----------------------------
+
+-- Urso-Lago
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(1, 1, 0.06);
+-- Urso-Floresta
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(2, 1, 0.05);
+-- Urso-Pantano
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(3, 1, 0.2);
+-- Urso-Cultivo
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(4, 1, 0.12);
+
+-- Raposa-Lago
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(1, 2, 0.06);
+-- Raposa-Floresta
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(2, 2, 0.05);
+-- Raposa-Pantano
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(3, 2, 0.2);
+-- Raposa-Cultivo
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(4, 2, 0.12);
+
+-- Lobo-Lago
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(1, 3, 0.06);
+-- Lobo-Floresta
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(2, 3, 0.05);
+-- Lobo-Pantano
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(3, 3, 0.2);
+-- Lobo-Cultivo
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(4, 3, 0.12);
+
+-- Coelho-Lago
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(1, 4, 0.06);
+-- Coelho-Floresta
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(2, 4, 0.05);
+-- Coelho-Pantano
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(3, 4, 0.2);
+-- Coelho-Cultivo
+INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(4, 4, 0.12);
+
+\echo -> Afetacoes:
+SELECT 
+    tipo_objeto_movel.nome as "Tipo do Objeto Movel", 
+    tipo_terreno.nome as "Tipo de Terreno", 
+    coef_atrito as "Coeficiente de Atrito"
+FROM afetacao_tipo_terreno_tipo_objeto_movel
+LEFT JOIN tipo_terreno ON afetacao_tipo_terreno_tipo_objeto_movel.id_tipo_terreno = tipo_terreno.id_tipo_terreno
+LEFT JOIN tipo_objeto_movel ON afetacao_tipo_terreno_tipo_objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel;
+
+
+----------------------------
+-- DATA VALIDATION
+----------------------------
+\echo -> Data Validation:
+\echo Terrenos:
+SELECT 
+    id_terreno as "ID do Terreno", 
+    tipo_terreno.nome as "Tipo de Terreno", 
+    ST_AsText( geo_terreno ) as "Geometria do Terreno"
+FROM terreno
+LEFT JOIN Tipo_Terreno ON terreno.id_tipo_terreno = tipo_terreno.id_tipo_terreno;
+
+\echo Objetos Moveis (Animais):
+SELECT 
+    objeto_movel.id_objeto_movel as "ID do Objeto Movel", 
+    objeto_movel.nome as "Nome do Objeto Movel",
+    tipo_objeto_movel.nome as "Tipo do Objeto Movel"
+FROM objeto_movel
+LEFT JOIN tipo_objeto_movel ON objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel;
+
+\echo Cinematica dos Objetos Moveis: 
+SELECT 
+    objeto_movel.id_objeto_movel as "ID do Objeto Movel", 
+    objeto_movel.nome as "Nome do Objeto Movel" 
+    ST_AsText(cinematica.geo_ponto) as "Posicao",
+    cinematica.orientacao as "Orientacao",
+    cinematica.velocidade as "Velocidade",
+    cinematica.aceleracao as "Aceleracao",
+    cinematica.boost as "Boost"
+FROM objeto_movel
+LEFT JOIN tipo_objeto_movel ON objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel
+LEFT JOIN cinematica ON objeto_movel.id_cinematica = cinematica.id_cinematica;
+
+\echo Perseguicao:
+SELECT 
+    predador.nome as "Predador",
+    presa.nome as "Presa",
+    ST_AsText(c_predador.geo_ponto) as "Posicao Predador",
+    ST_AsText(c_presa.geo_ponto) as "Posicao Presa"
+FROM objeto_movel as predador
+LEFT JOIN objeto_movel as presa on predador.id_alvo = presa.id_objeto_movel
+LEFT JOIN cinematica as c_predador on predador.id_cinematica = c_predador.id_cinematica
+LEFT JOIN cinematica as c_presa on presa.id_cinematica = c_presa.id_cinematica
+WHERE predador.id_alvo IS NOT NULL;
+
+

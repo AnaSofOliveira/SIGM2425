@@ -1,0 +1,294 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+-- mais informa��o sobre "client_encoding" em:
+-- http://www.postgresql.org/docs/9.4/static/multibyte.html
+\encoding WIN1250
+--\encoding UTF8
+;
+
+--=========================================
+-- Quais os infant�rios de cada freguesia ?
+--=========================================
+
+CREATE OR REPLACE VIEW inf_freg
+AS
+SELECT
+    inf.nome,
+    inf.local,
+    freg.nome AS nome_freguesia,
+    freg.lucro AS lucro_freguesia,
+    freg.local AS local_freguesia,
+    ST_Area(freg.local) AS area_freguesia
+FROM
+    infantario AS inf
+JOIN
+    freguesia AS freg
+ON 
+    ST_Within(inf.local, freg.local)
+;
+
+\echo -> Infantarios por cada Freguesia
+SELECT 
+    nome_freguesia as "Nome da Freguesia", 
+    lucro_freguesia as "Lucro da Freguesia", 
+    ST_AsText(local_freguesia) as "Localizacao da Freguesia",  
+    ROUND(area_freguesia::NUMERIC, 3) as "Area da Freguesia", 
+    nome as "Nome do Infantario", 
+    ST_AsText(local) as "Localizacao do Infantario"
+FROM 
+    inf_freg;
+
+--=========================================
+-- Qual o lucro de cada freguesia ?
+--=========================================
+
+
+CREATE OR REPLACE VIEW freg_lucro
+AS
+SELECT 
+    inf_freg.nome_freguesia,
+    inf_freg.lucro_freguesia
+FROM
+   inf_freg 
+ORDER BY
+   inf_freg.nome_freguesia
+;
+
+\echo -> Lucro por Freguesia
+SELECT 
+    nome_freguesia as "Nome da Freguesia", 
+    lucro_freguesia as "Lucro da Freguesia"
+FROM 
+    freg_lucro;
+
+--=========================================
+-- Qual o máximo lucro das freguesias ?
+--=========================================
+
+CREATE OR REPLACE VIEW freg_max_lucro
+AS
+SELECT 
+    nome_freguesia,
+    MAX(freg_lucro.lucro_freguesia) as max_lucro
+FROM
+   freg_lucro 
+GROUP BY
+    nome_freguesia
+;
+
+\echo -> Lucro Maximo das Freguesias
+SELECT 
+    nome_freguesia as "Nome da Freguesia", 
+    max_lucro as "Maximo Lucro da Freguesia"
+FROM 
+    freg_max_lucro;
+
+--=========================================
+-- Quais as freguesias mais lucrativas ?
+--=========================================
+
+CREATE OR REPLACE VIEW freg_max
+AS
+SELECT 
+    freg_lucro.nome_freguesia
+FROM
+    freg_lucro
+JOIN
+    freg_max_lucro
+ON
+    freg_lucro.lucro_freguesia = freg_max_lucro.max_lucro
+;
+
+\echo -> Freguesias mais lucrativas
+SELECT 
+    nome_freguesia as "Nome da Freguesia"
+FROM 
+    freg_max;
+
+--=========================================
+-- Quais as infantários das freguesias mais lucrativas ?
+--=========================================
+
+CREATE OR REPLACE VIEW inf_freg_max
+AS
+SELECT 
+    inf_freg.nome as nome_infantario,
+    inf_freg.local as local_infantario, 
+    freg_max.nome_freguesia as nome_freguesia
+FROM
+    inf_freg
+JOIN
+    freg_max
+ON
+    inf_freg.nome_freguesia = freg_max.nome_freguesia
+;
+
+\echo -> Infantarios da(s) Freguesia(s) mais lucrativa(s)
+SELECT 
+    nome_infantario as "Nome do Infantario",
+    ST_AsText(local_infantario) as "Localizacao da Freguesia", 
+    nome_freguesia as "Nome da Freguesia"
+FROM inf_freg_max;
+
+--=========================================
+-- Quais os clientes com filhos em idade escolar ?
+--=========================================
+
+CREATE OR REPLACE VIEW cli_fie
+AS
+SELECT DISTINCT
+    cli.nomeproprio || ' ' || cli.apelido as nome_cliente,
+    cli.codigo as codigo_cliente,
+    cli.local as local_cliente
+FROM
+    cliente AS cli
+JOIN 
+    filho AS fil
+ON
+    cli.codigo = fil.fk_cliente
+WHERE
+    AGE(fil.dataNascimento) < INTERVAL '5 years'
+;
+
+\echo -> Clientes com Filhos em idade escolar
+SELECT 
+    nome_cliente as "Nome do Cliente", 
+    codigo_cliente as "Codigo do Cliente", 
+    ST_AsText(local_cliente) as "Localizacao do Cliente"
+FROM
+    cli_fie;
+
+--=========================================
+-- Quais os clientes com filhos em idade escolar que residem até
+-- 100 metros dos infantários da freguesia mais lucrativa ?
+--=========================================
+
+CREATE OR REPLACE VIEW v_cli_freg
+AS
+SELECT DISTINCT
+    cli_fie.nome_cliente as nome_cliente, 
+    cli_fie.codigo_cliente as codigo_cliente, 
+    cli_fie.local_cliente as local_cliente
+FROM
+    cli_fie
+JOIN 
+    inf_freg_max
+ON
+    ST_Distance(cli_fie.local_cliente, inf_freg_max.local_infantario) < 100
+;
+
+\echo -> Clientes com Filhos em idade escolar que residem ate 100 metros dos Infatarios das Freguesia mais lucrativa
+SELECT
+    nome_cliente as "Nome do Cliente", 
+    codigo_cliente as "Codigo do Cliente", 
+    ST_AsText(local_cliente) as "Localizacao do Cliente"
+FROM 
+    v_cli_freg;
+
+--=========================================================================================
+
+
+
+
+--=========================================
+-- Qual a freguesia de cada cliente?
+--=========================================
+
+CREATE OR REPLACE VIEW cli_freg
+AS
+SELECT
+    cli.codigo AS codigo_cliente,
+    cli.nomeproprio || ' ' || cli.apelido as nome_cliente,
+    freg.nome AS freguesia_nome,
+    freg.local AS freguesia_local
+FROM 
+    cliente AS cli
+JOIN 
+    freguesia AS freg
+ON 
+    ST_Intersects(cli.local, freg.local)
+;
+
+\echo -> Freguesia de cada Cliente
+SELECT 
+    codigo_cliente as "Codigo do Cliente", 
+    nome_cliente as "Nome do Cliente", 
+    freguesia_nome as "Nome da Freguesia", 
+    ST_AsText(freguesia_local) as "Localizacao da Freguesia"
+FROM 
+    cli_freg
+ORDER BY
+    "Nome do Cliente";
+
+--=========================================
+-- Qual o infantário mais proximo?
+--=========================================
+
+CREATE OR REPLACE VIEW cli_inf_prox
+AS
+SELECT
+    cli.codigo AS codigo_cliente,
+    cli.local AS local_cliente,
+    inf.nome AS infantario_nome,
+    inf.local AS infantario_local
+FROM 
+    cliente AS cli
+JOIN 
+    infantario AS inf
+ON 
+    ST_Distance(cli.local, inf.local) = (
+        SELECT 
+            MIN(ST_Distance(cli.local, inf2.local))
+        FROM 
+            infantario as inf2
+    )
+;
+
+SELECT 
+    codigo_cliente as "Codigo do Cliente", 
+    ST_AsText(local_cliente) as "Localizacao do Cliente", 
+    infantario_nome as "Nome do Infantario", 
+    ST_AsText(infantario_local) as "Localizacao do Infantario"
+FROM 
+    cli_inf_prox;
+
+--=========================================
+-- Qauis os clientes que vivem numa freguesia mas estão
+-- mais perto de algum infantário de outra freguesia (diferente daquela onde vivem)?
+--=========================================
+
+CREATE OR REPLACE VIEW v_inf_freg
+AS
+SELECT DISTINCT
+    cli_inf_prox.codigo_cliente as oid,
+    cli_inf_prox.local_cliente as local_cliente
+FROM
+    cli_freg
+JOIN
+    cli_inf_prox
+ON 
+    ST_Intersects(cli_inf_prox.infantario_local, cli_freg.freguesia_local) = false
+;
+
+SELECT 
+    oid as "Codigo do Cliente (OID)", 
+    ST_AsText(local_cliente) as "Localizacao do Cliente"
+FROM v_inf_freg;

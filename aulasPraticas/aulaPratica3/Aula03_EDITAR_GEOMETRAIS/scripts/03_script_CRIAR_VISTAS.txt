@@ -1,0 +1,155 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis_gps
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+--------------------------------
+DROP TABLE IF EXISTS t_ponto_fronteira;
+DROP VIEW IF EXISTS v_poligono;
+DROP VIEW IF EXISTS v_linha_extremo_coincidente;
+DROP TABLE IF EXISTS taux_linha_contorno;
+DROP VIEW IF EXISTS v_linha_contorno;
+DROP VIEW IF EXISTS v_pontos_ordenados;
+--------------------------------
+
+
+
+----------------------------
+-- VIEW V_LINHA_CONTORNO
+-- (a partir de GPS_PONTO)
+----------------------------
+create or replace view v_pontos_ordenados (g_ponto, ordem, id_terreno)
+as
+(select 
+	gps_ponto.g_ponto as g_ponto, 
+	gps_ponto.id_ordem as ordem, 
+	gps_ponto.id_terreno
+from gps_ponto
+order by id_terreno, id_ordem);
+
+\echo -> Pontos ordenados: 
+select 
+    ordem as "Ordem", 
+    id_terreno as "ID do Terreno",
+    ST_AsText(g_ponto) as "Ponto"
+from 
+    v_pontos_ordenados;
+
+
+create or replace view v_linha_contorno(id_terreno, g_linha) 
+as (
+	select v_pontos_ordenados.id_terreno, ST_MakeLine(v_pontos_ordenados.g_ponto) as g_linha
+	from v_pontos_ordenados
+	group by id_terreno
+);
+
+\echo Linhas de Contorno dos Terrenos: 
+select 
+    id_terreno as "ID do Terreno", 
+    ST_AsText(g_linha) as "Linha de Contorno"
+from 
+    v_linha_contorno;
+
+
+----------------------------
+-- TAUX_LINHA_CONTORNO
+-- (apenas para usar apresentar no QGIS)
+----------------------------
+CREATE TABLE taux_linha_contorno ( id SERIAL PRIMARY KEY );
+SELECT AddGeometryColumn
+('', 'taux_linha_contorno', 'g_linha', 0, 'LINESTRING', 2 );
+
+INSERT INTO taux_linha_contorno( g_linha )
+SELECT g_linha
+FROM v_linha_contorno;
+
+
+----------------------------
+-- VIEW V_LINHA_EXTREMO_COINCIDENTE
+-- (gerar extremidades coincidentes)
+----------------------------
+create or replace view v_linha_extremo_coincidente(id_terreno, g_linha) as 
+select id_terreno, 
+	ST_UnaryUnion(g_linha) as g_linha
+from v_linha_contorno;
+
+\echo Linha Extremo Coincidente: 
+select 
+    id_terreno as "ID do Terreno", 
+    ST_AsText(g_linha) as "Linha" 
+from 
+    v_linha_extremo_coincidente;
+
+----------------------------
+-- VIEW V_POLIGONO
+----------------------------
+create  or replace view v_poligono(id_terreno, g_poligono) as 
+select 
+	id_terreno, 
+	ST_BuildArea(g_linha) as g_linha
+from v_linha_extremo_coincidente;
+
+
+\echo Poligonos: 
+SELECT 
+    id_terreno as "ID do Terreno", 
+    ST_AsText( g_poligono ) AS "Poligono"
+FROM V_POLIGONO;
+
+
+----------------------------
+-- T_LINHA_EXTREMO_COINCIDENTE
+-- (criar tabela para visualizar no QGIS)
+----------------------------
+CREATE TABLE t_ponto_fronteira( id SERIAL PRIMARY KEY );
+SELECT AddGeometryColumn( '', 't_ponto_fronteira', 'g_multi_ponto', 0, 'MULTIPOINT', 2 );
+
+\echo -> Projecao das Linhas Continuas em Multilinha:  
+SELECT 
+    ST_AsText(ST_GeometryN( g_linha, generate_series( 1, ST_NumGeometries( g_linha ) ) ) ) AS "Linha"
+FROM V_LINHA_EXTREMO_COINCIDENTE;
+
+
+\echo -> Avaliar se valor da serie e impar ou par: 
+SELECT
+( CASE WHEN x % 2 = 0
+  THEN 'PAR'
+  ELSE 'IMPAR'
+  END )
+FROM generate_series( 1, 10 ) AS x;
+
+
+
+INSERT INTO t_ponto_fronteira(g_multi_ponto)
+SELECT 
+    ST_Boundary(geom) AS g_multi_ponto
+FROM (
+    -- Projecao das Linhas Continuas em Multilinha
+    SELECT 
+        ST_GeometryN(g_linha, generate_series(1, ST_NumGeometries(g_linha))) AS geom
+    FROM 
+        V_LINHA_EXTREMO_COINCIDENTE
+) AS multi_ponto
+WHERE 
+    NOT ST_IsEmpty(geom);
+
+\echo Tabela Ponto_Fronteira: 
+select
+    ST_AsText(g_multi_ponto) as "Pontos da Fronteira"
+from 
+    t_ponto_fronteira;

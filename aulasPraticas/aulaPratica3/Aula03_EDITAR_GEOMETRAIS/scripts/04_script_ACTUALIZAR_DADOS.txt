@@ -1,0 +1,66 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis_gps
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+\echo -> Terreno (antes da atualizacao):
+select
+    * 
+from 
+    terreno;
+
+----------------------------
+-- TERRENO
+-- (actualizar os poligonos)
+----------------------------
+--- UPDATE TERRENO
+UPDATE 
+    TERRENO
+SET 
+    g_terreno = ( 
+        SELECT 
+            g_poligono
+        FROM 
+            V_POLIGONO AS VP
+        WHERE 
+            VP.id_terreno = TERRENO.id_terreno 
+    )
+;
+UPDATE 
+    TERRENO
+SET 
+    g_terreno = ( 
+        SELECT 
+            g_poligono
+        FROM 
+            V_POLIGONO AS poligono
+        WHERE 
+            poligono.id_terreno = TERRENO.id_terreno 
+    )
+;
+
+
+\echo -> Terreno (apos a atualizacao):
+select
+    * 
+from 
+    terreno;
+
+
+
+
+
+

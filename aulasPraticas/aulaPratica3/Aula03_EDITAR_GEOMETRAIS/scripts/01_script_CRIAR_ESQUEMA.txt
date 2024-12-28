@@ -1,0 +1,74 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis_gps
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+--------------------------------
+-- Criar o Esquema Relacional
+--------------------------------
+
+ALTER TABLE terreno DROP CONSTRAINT fk1;
+ALTER TABLE gps_ponto DROP CONSTRAINT fk1;
+
+
+DROP TABLE IF EXISTS t_ponto_fronteira;
+DROP VIEW IF EXISTS v_poligono;
+DROP VIEW IF EXISTS v_linha_extremo_coincidente;
+DROP TABLE IF EXISTS taux_linha_contorno;
+DROP VIEW IF EXISTS v_linha_contorno;
+DROP VIEW IF EXISTS v_pontos_ordenados;
+
+DROP TABLE IF EXISTS gps_ponto;
+DROP TABLE IF EXISTS terreno;
+DROP TABLE IF EXISTS tipo_terreno;
+
+---------------------------------
+
+
+
+---------------------------------
+-- TIPO_TERRENO
+---------------------------------
+CREATE TABLE tipo_terreno (
+    id_tipo_terreno VARCHAR PRIMARY KEY
+);
+
+
+
+---------------------------------
+-- TERRENO
+---------------------------------
+CREATE TABLE terreno (
+    id_terreno INTEGER PRIMARY KEY, 
+    id_tipo_terreno VARCHAR, 
+    CONSTRAINT fk1 FOREIGN KEY(id_tipo_terreno) REFERENCES tipo_terreno(id_tipo_terreno) 
+);
+
+SELECT AddGeometryColumn('public', 'terreno', 'g_terreno', 0, 'POLYGON', 2);
+
+---------------------------------
+-- GPS_PONTO
+---------------------------------
+CREATE TABLE gps_ponto (
+    id_ordem INTEGER,
+    id_terreno INTEGER, 
+    CONSTRAINT pk_gps_ponto PRIMARY KEY(id_ordem, id_terreno), 
+    CONSTRAINT fk1 FOREIGN KEY(id_terreno) REFERENCES terreno(id_terreno)
+);
+
+SELECT AddGeometryColumn('public', 'gps_ponto', 'g_ponto', 0, 'POINT', 2);
+

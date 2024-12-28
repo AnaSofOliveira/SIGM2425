@@ -1,0 +1,54 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+--==============================
+-- Eliminar o Esquema Relacional
+--==============================
+
+
+DROP VIEW IF EXISTS v_cli_freg;
+DROP VIEW IF EXISTS cli_fie;
+DROP VIEW IF EXISTS inf_freg_max;
+DROP VIEW IF EXISTS freg_max;
+DROP VIEW IF EXISTS freg_max_lucro;
+DROP VIEW IF EXISTS freg_lucro;
+DROP VIEW IF EXISTS inf_freg;
+
+DROP VIEW IF EXISTS v_inf_freg;
+DROP VIEW IF EXISTS cli_inf_prox;
+DROP VIEW IF EXISTS cli_freg;
+
+ALTER TABLE Filho
+DROP CONSTRAINT IF EXISTS fk_cliente;
+
+ALTER TABLE Filho
+DROP CONSTRAINT IF EXISTS fk_infantario;
+
+
+DROP TABLE IF EXISTS Cliente;
+
+
+DROP TABLE IF EXISTS Filho;
+
+
+DROP TABLE IF EXISTS Infantario;
+
+
+DROP TABLE IF EXISTS freguesia;

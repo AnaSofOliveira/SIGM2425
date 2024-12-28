@@ -1,0 +1,129 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+-- mais informa��o sobre "client_encoding" em:
+-- http://www.postgresql.org/docs/9.4/static/multibyte.html
+\encoding WIN1250
+;
+
+
+
+
+--===================
+-- Interrogar CLIENTE
+--===================
+
+\echo -> Ponto Geografico de cada Cliente:
+SELECT 
+    nomeproprio || ' ' || apelido as "Nome do Cliente Completo",
+    ST_AsText(local) AS "Localizacao" 
+FROM cliente;
+
+
+\echo -> Coordenadas do ponto Geografico de cada Cliente:
+SELECT 
+    nomeproprio || ' ' || apelido as "Nome do Cliente Completo",
+    ST_X(local) AS "Abcissa(X)", 
+    ST_Y(local) AS "Ordenada(Y)"
+FROM cliente ORDER BY "Nome do Cliente Completo";
+
+
+--=====================
+-- Interrogar FREGUESIA
+--=====================
+
+\echo -> Espaco Geografico delimitado por cada Freguesia:
+SELECT 
+    nome as "Freguesia", 
+    ST_Extent(local) AS "Espaco Geografico" 
+FROM 
+    freguesia
+GROUP BY 
+    nome;
+
+
+\echo -> Area ocupada por cada Freguesia:
+SELECT 
+    nome as "Freguesia", 
+    ST_Area(local) AS "Area" 
+FROM 
+    freguesia;
+
+
+
+--==================================
+-- Interrogar INFANTARIO e FREGUESIA
+--==================================
+
+\echo -> [ST_Intersects] Infantarios de cada Freguesia (considerando apenas operacoes espaciais)
+SELECT
+    freguesia.nome AS "Nome da Freguesia",
+    ST_AsText(freguesia.local) AS "Geometria da Freguesia",
+    infantario.nome as "Nome do Infantario",
+    ST_AsText(infantario.local) AS "Localizacao do Infantario"
+FROM
+    freguesia
+LEFT JOIN
+    infantario
+ON 
+    ST_Intersects(freguesia.local, infantario.local)   
+;
+
+
+\echo -> [ST_Within] Infantarios de cada Freguesia (considerando apenas operacoes espaciais)
+SELECT
+    freguesia.nome AS "Nome da Freguesia",
+    ST_AsText(freguesia.local) AS "Geometria da Freguesia",
+    infantario.nome as "Nome do Infantario",
+    ST_AsText(infantario.local) AS "Localizacao do Infantario"
+FROM
+    freguesia
+JOIN
+    infantario
+ON 
+    ST_Within(infantario.local, freguesia.local);
+
+
+
+
+\echo -> Distancia de cada Cliente a cada Infantario
+SELECT
+    cliente.nomeproprio || ' ' || cliente.apelido as "Nome Completo",
+    ST_AsText(cliente.local) as "Localizacao do Cliente", 
+    infantario.nome AS "Nome Infantario",
+    ST_AsText(infantario.local) as "Localizacao do Infantario",
+    ROUND(ST_Distance(cliente.local, infantario.local)::NUMERIC, 3) AS "Distancia"
+FROM
+    cliente,
+    infantario;
+
+
+
+\echo -> Clientes que vivem a uma Distancia Superior de 20 (unidades) de algum Infantario 
+SELECT
+    infantario.nome AS "Localizacao do Infantario",
+    cliente.nomeproprio || ' ' || cliente.apelido as "Nome do Cliente Completo",
+    ROUND(ST_Distance(cliente.local, infantario.local)::NUMERIC, 3) AS "Distancia"
+FROM
+    infantario
+JOIN
+    cliente
+ON
+    ST_Distance(infantario.local, cliente.local) > 20;

@@ -1,0 +1,33 @@
+--#############
+--# Paulo Trigo
+--#############
+
+
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+
+--===============
+-- Eliminar Dados
+--===============
+
+DELETE FROM filho;
+
+DELETE FROM cliente;
+
+DELETE FROM infantario;
+
+DELETE FROM freguesia;
