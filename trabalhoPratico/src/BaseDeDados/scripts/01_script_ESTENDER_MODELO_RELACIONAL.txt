@@ -23,19 +23,38 @@
 ----------------------------------------------------
 ----------------------------------------------------
 
-DROP OPERATOR IF EXISTS *( t_vector, real );
-DROP OPERATOR IF EXISTS +( t_vector, t_vector );
-DROP OPERATOR IF EXISTS -( t_vector, t_vector );
-DROP OPERATOR IF EXISTS -( geometry, geometry );
-DROP FUNCTION IF EXISTS produto_vector_por_escalar( t_vector, real );
-DROP FUNCTION IF EXISTS soma_vector_vector( t_vector, t_vector );
-DROP FUNCTION IF EXISTS subtrair_vector( t_vector, t_vector );
-DROP FUNCTION IF EXISTS subtrair_geometry( geometry, geometry );
-DROP FUNCTION IF EXISTS geometry_to_tvector( geometry );
-DROP FUNCTION IF EXISTS normalizar( t_vector );
+\echo -> Eliminar Operadores
+DROP OPERATOR IF EXISTS /(t_vector, real);
+DROP OPERATOR IF EXISTS /(real, t_vector);
+DROP OPERATOR IF EXISTS -(geometry, geometry);
+DROP OPERATOR IF EXISTS -(t_vector, t_vector);
+DROP OPERATOR IF EXISTS +(t_vector, t_vector);
+DROP OPERATOR IF EXISTS *(t_vector, real);
+DROP OPERATOR IF EXISTS *(real, t_vector);
 
-DROP TYPE IF EXISTS t_velocidade;
+\echo 
+\echo -> Eliminar Funcoes
+DROP FUNCTION IF EXISTS criar_views_objetos;
+DROP FUNCTION IF EXISTS simular_perseguicao (int);
+DROP FUNCTION IF EXISTS centrar_forma2D (geometry, geometry, double precision);
+DROP FUNCTION IF EXISTS obter_aceleracao (int, int, real, int);
+DROP FUNCTION IF EXISTS novo_aceleracao_linear (objeto_movel, objeto_movel, real);
+DROP FUNCTION IF EXISTS novo_velocidade (t_velocidade, t_aceleracao, real, t_velocidade);
+DROP FUNCTION IF EXISTS novo_orientacao (real, t_velocidade, real);
+DROP FUNCTION IF EXISTS novo_posicao (geometry, t_velocidade, real);
+DROP FUNCTION IF EXISTS obter_terreno (geometry);
+DROP FUNCTION IF EXISTS normalizar (t_vector);
+DROP FUNCTION IF EXISTS divisao_vector_por_escalar (t_vector, real);
+DROP FUNCTION IF EXISTS subtrair_geometry (geometry, geometry);
+DROP FUNCTION IF EXISTS geometry_to_tvector (geometry);
+DROP FUNCTION IF EXISTS subtrair_vector (t_vector, t_vector);
+DROP FUNCTION IF EXISTS soma_vector_vector (t_vector, t_vector);
+DROP FUNCTION IF EXISTS produto_vector_por_escalar (t_vector, real);
+
+\echo
+\echo -> Eliminar Tipos
 DROP TYPE IF EXISTS t_aceleracao;
+DROP TYPE IF EXISTS t_velocidade;
 DROP TYPE IF EXISTS t_vector;
 
 ----------------------------------------------------
@@ -43,17 +62,21 @@ DROP TYPE IF EXISTS t_vector;
 -- Estender o Modelo Relacional com Novos Tipos
 ----------------------------------------------------
 ----------------------------------------------------
-
+\echo
+\echo -> Criar Tipos
+\echo     * t_vector
 CREATE TYPE t_vector AS (
     x REAL, 
     y REAL
 );
 
+\echo     * t_velocidade
 CREATE TYPE t_velocidade AS (
     linear t_vector, 
     angular REAL
 );
 
+\echo     * t_aceleracao
 CREATE TYPE t_aceleracao AS (
     linear t_vector, 
     angular REAL
@@ -65,7 +88,9 @@ CREATE TYPE t_aceleracao AS (
 -- Estender o Modelo Relacional com Novas Funcoes e Operadores
 ----------------------------------------------------
 ----------------------------------------------------
-
+\echo
+\echo -> Criar Funcoes e Operadores
+\echo     * Funcao produto_vector_por_escalar (t_vector, real)
 CREATE OR REPLACE FUNCTION produto_vector_por_escalar( vec t_vector, v real )
 RETURNS t_vector
 AS $$
@@ -79,6 +104,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+\echo     * Operador * (t_vector, real)
 CREATE OPERATOR * (
     leftarg = t_vector,
     rightarg = real,
@@ -88,6 +114,7 @@ CREATE OPERATOR * (
 
 ----------------------------------------------------
 
+\echo     * Funcao soma_vector_vector (t_vector, t_vector)
 CREATE OR REPLACE FUNCTION soma_vector_vector( vec_a t_vector, vec_b t_vector )
 RETURNS t_vector
 AS $$
@@ -101,6 +128,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+\echo     * Operador + (t_vector, t_vector)
 CREATE OPERATOR + (
     leftarg = t_vector,
     rightarg = t_vector,
@@ -110,6 +138,7 @@ CREATE OPERATOR + (
 
 ----------------------------------------------------
 
+\echo     * Funcao subtrair_vector (t_vector, t_vector)
 CREATE OR REPLACE FUNCTION subtrair_vector( vec_a t_vector, vec_b t_vector )
 RETURNS t_vector
 AS $$
@@ -123,6 +152,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+\echo     * Operador - (t_vector, t_vector)
 CREATE OPERATOR - (
     leftarg = t_vector,
     rightarg = t_vector,
@@ -132,6 +162,7 @@ CREATE OPERATOR - (
 
 ----------------------------------------------------
 
+\echo     * Funcao geometry_to_tvector (geometry)
 CREATE OR REPLACE FUNCTION geometry_to_tvector(geom geometry)
 RETURNS t_vector
 AS $$
@@ -145,7 +176,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
+\echo     * Funcao subtrair_geometry (geometry, geometry)
 CREATE OR REPLACE FUNCTION subtrair_geometry( geo_a geometry, geo_b geometry )
 RETURNS t_vector
 AS $$
@@ -154,7 +185,7 @@ SELECT
 ;
 $$ LANGUAGE 'sql';
 
-
+\echo     * Operador - (geometry, geometry)
 CREATE OPERATOR - (
     leftarg = geometry,
     rightarg = geometry,
@@ -164,6 +195,7 @@ CREATE OPERATOR - (
 
 ----------------------------------------------------
 
+\echo     * Funcao divisao_vector_por_escalar (t_vector, real)
 CREATE OR REPLACE FUNCTION divisao_vector_por_escalar( vec t_vector, v real )
 RETURNS t_vector
 AS $$
@@ -177,15 +209,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+\echo     * Operador / (t_vector, real)
 CREATE OPERATOR / (
     leftarg = t_vector,
     rightarg = real,
-    procedure = produto_vector_por_escalar,
+    procedure = divisao_vector_por_escalar,
     commutator = /
 );
 
 ----------------------------------------------------
 
+\echo     * Funcao normalizar (t_vector)
 CREATE OR REPLACE FUNCTION normalizar( vec t_vector )
 RETURNS t_vector
 AS $$

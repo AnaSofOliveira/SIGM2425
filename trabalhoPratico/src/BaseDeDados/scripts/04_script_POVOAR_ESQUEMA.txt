@@ -19,6 +19,7 @@
 -- Eliminar Dados (anteriores)
 --=============================
 
+\echo Eliminar Dados das Tabelas:
 DELETE FROM AFETACAO_TIPO_TERRENO_TIPO_OBJETO_MOVEL;
 DELETE FROM TERRENO;
 DELETE FROM TIPO_TERRENO;
@@ -36,22 +37,24 @@ DELETE FROM CINEMATICA_HIST;
 ----------------------------
 -- TIPO_TERRENO
 ----------------------------
+\echo 
+\echo -> Povoar Tabela TIPO_TERRENO:
 INSERT INTO tipo_terreno( id_tipo_terreno, nome ) VALUES(1, 'Lago' ); 
 INSERT INTO tipo_terreno( id_tipo_terreno, nome ) VALUES(2, 'Floresta' ); 
 INSERT INTO tipo_terreno( id_tipo_terreno, nome ) VALUES(3, 'Pantano' ); 
 INSERT INTO tipo_terreno( id_tipo_terreno, nome ) VALUES(4, 'Cultivo' );
 
-\echo -> Tipos de Terrenos:
-SELECT 
-    id_tipo_terreno as "Tipo de Terreno", 
-    nome as "Nome do Terreno"
-FROM tipo_terreno;
-
+select 
+    id_tipo_terreno, 
+    nome
+from tipo_terreno;
 
 ----------------------------
 -- TERRENO
 ----------------------------
 
+\echo
+\echo -> Povoar Tabela TERRENO:
 -- Floresta
 INSERT INTO terreno( id_terreno, id_tipo_terreno, geo_terreno, z_index ) 
 VALUES( 3, 2, ST_MakePolygon( ST_GeomFromText('LINESTRING(100 300,300 100,700 100,1100 300,1700 100,2400 200,3000 500,3300 1100,3300 1600,2500 1900,1800 1900,1100 1700,600 1100,100 900,100 300)')), 1
@@ -82,17 +85,19 @@ INSERT INTO terreno( id_terreno, id_tipo_terreno, geo_terreno, z_index  )
 VALUES( 6, 4, ST_MakePolygon( ST_GeomFromText('LINESTRING(2200 1500,2300 1200,2600 1100,3200 1300,3200 1500,3000 1600,2700 1700,2300 1800,2200 1500)')), 2
 );
 
-
-\echo -> Terrenos:
-SELECT 
-    id_terreno as "ID do Terreno", 
-    id_tipo_terreno as "Tipo de Terreno", 
-    ST_AsText( geo_terreno ) as "Geometria do Terreno"
-FROM terreno;
+select 
+    id_terreno, 
+    id_tipo_terreno, 
+    z_index,
+    ST_AsText(geo_terreno) as geo_terreno
+from terreno;
 
 ----------------------------
 -- TIPO_OBJETO_MOVEL
 ----------------------------
+
+\echo
+\echo -> Povoar Tabela TIPO_OBJETO_MOVEL:
 
 INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome, geo_corpo ) VALUES(1, 'Urso', 
 ST_MakePolygon( ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1, 1 0, 0 0)'))
@@ -107,15 +112,18 @@ INSERT INTO tipo_objeto_movel( id_tipo_objeto_movel, nome, geo_corpo ) VALUES(4,
 ST_MakePolygon( ST_GeomFromText('LINESTRING(0.5 0, 0 0.5, 0.5 1, 1 0.5, 0.5 0)'))
 );
 
-\echo -> Tipos de Objetos Moveis:
-SELECT 
-    id_tipo_objeto_movel as "ID do Tipo de Objeto Movel", 
-    nome as "Nome do Objeto Movel"
-FROM tipo_objeto_movel;
+select 
+    id_tipo_objeto_movel, 
+    nome, 
+    ST_AsText(geo_corpo) as geo_corpo
+from tipo_objeto_movel;
 
 ----------------------------
 -- CINEMATICA
 ----------------------------
+
+\echo
+\echo -> Povoar Tabela CINEMATICA:
 
 -- Urso
 INSERT INTO cinematica( id_cinematica, geo_ponto, orientacao, velocidade, velocidade_maxima, aceleracao, aceleracao_maxima, boost ) 
@@ -234,55 +242,68 @@ VALUES(
     0.1 
 );
 
-
+select 
+    id_cinematica, 
+    ST_AsText(geo_ponto) as geo_ponto, 
+    orientacao, 
+    velocidade, 
+    velocidade_maxima, 
+    aceleracao, 
+    aceleracao_maxima, 
+    boost
+from cinematica;
 
 ----------------------------
 -- OBJETO_MOVEL
 ----------------------------
 
+\echo
+\echo -> Povoar Tabela OBJETO_MOVEL:
+
 -- Urso
-INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica, id_alvo) 
-VALUES(1, 'Urso 1', 1, 1, 7);
+INSERT INTO objeto_movel( id_objeto_movel, id_tipo_objeto_movel, id_cinematica, id_alvo) 
+VALUES(1, 1, 1, 7);
 -- Urso
-INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
-VALUES(2, 'Urso 2', 1, 2);
+INSERT INTO objeto_movel( id_objeto_movel, id_tipo_objeto_movel, id_cinematica) 
+VALUES(2, 1, 2);
 
 -- Raposa
-INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica, id_alvo) 
-VALUES(3, 'Raposa 1', 2, 3, 8);
+INSERT INTO objeto_movel( id_objeto_movel, id_tipo_objeto_movel, id_cinematica, id_alvo) 
+VALUES(3, 2, 3, 8);
 -- Raposa
-INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
-VALUES(4, 'Raposa 2', 2, 4);
+INSERT INTO objeto_movel( id_objeto_movel, id_tipo_objeto_movel, id_cinematica) 
+VALUES(4, 2, 4);
 
 -- Lobo
-INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica, id_alvo) 
-VALUES(5, 'Lobo 1', 3, 5, 9);
+INSERT INTO objeto_movel( id_objeto_movel, id_tipo_objeto_movel, id_cinematica, id_alvo) 
+VALUES(5, 3, 5, 9);
 -- Lobo
-INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
-VALUES(6, 'Lobo 2', 3, 6);
+INSERT INTO objeto_movel( id_objeto_movel, id_tipo_objeto_movel, id_cinematica) 
+VALUES(6, 3, 6);
 
 -- Coelho
-INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
-VALUES(7, 'Coelho 1', 4, 7);
+INSERT INTO objeto_movel( id_objeto_movel, id_tipo_objeto_movel, id_cinematica) 
+VALUES(7, 4, 7);
 -- Coelho
-INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
-VALUES(8, 'Coelho 2', 4, 8);
+INSERT INTO objeto_movel( id_objeto_movel, id_tipo_objeto_movel, id_cinematica) 
+VALUES(8, 4, 8);
 -- Coelho
-INSERT INTO objeto_movel( id_objeto_movel, nome, id_tipo_objeto_movel, id_cinematica) 
-VALUES(9, 'Coelho 3', 4, 9);
+INSERT INTO objeto_movel( id_objeto_movel, id_tipo_objeto_movel, id_cinematica) 
+VALUES(9, 4, 9);
 
-
-\echo -> Objetos Moveis:
-SELECT 
-    objeto_movel.id_objeto_movel as "ID do Objeto Movel", 
-    objeto_movel.nome as "Nome do Objeto Movel",
-    tipo_objeto_movel.nome as "Tipo do Objeto Movel"
-FROM objeto_movel
-LEFT JOIN tipo_objeto_movel ON objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel;
+select 
+    id_objeto_movel, 
+    id_tipo_objeto_movel, 
+    id_cinematica, 
+    id_alvo
+from objeto_movel;
 
 ----------------------------
 -- AFETACAO_TIPO_TERRENO_TIPO_OBJETO_MOVEL 
 ----------------------------
+
+\echo
+\echo -> Povoar Tabela AFETACAO_TIPO_TERRENO_TIPO_OBJETO_MOVEL:
 
 -- Urso-Lago
 INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(1, 1, 0.06);
@@ -320,59 +341,103 @@ INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_ob
 -- Coelho-Cultivo
 INSERT INTO afetacao_tipo_terreno_tipo_objeto_movel( id_tipo_terreno, id_tipo_objeto_movel, coef_atrito ) VALUES(4, 4, 0.12);
 
-\echo -> Afetacoes:
-SELECT 
-    tipo_objeto_movel.nome as "Tipo do Objeto Movel", 
-    tipo_terreno.nome as "Tipo de Terreno", 
-    coef_atrito as "Coeficiente de Atrito"
-FROM afetacao_tipo_terreno_tipo_objeto_movel
-LEFT JOIN tipo_terreno ON afetacao_tipo_terreno_tipo_objeto_movel.id_tipo_terreno = tipo_terreno.id_tipo_terreno
-LEFT JOIN tipo_objeto_movel ON afetacao_tipo_terreno_tipo_objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel;
+select 
+    id_tipo_terreno, 
+    id_tipo_objeto_movel, 
+    coef_atrito
+from afetacao_tipo_terreno_tipo_objeto_movel;
+
+
 
 
 ----------------------------
 -- DATA VALIDATION
 ----------------------------
-\echo -> Data Validation:
-\echo Terrenos:
-SELECT 
+\echo
+\echo -> Validacao dos Dados:
+\echo     * Terrenos:
+select 
     id_terreno as "ID do Terreno", 
     tipo_terreno.nome as "Tipo de Terreno", 
+    z_index as "Hierarquia",
     ST_AsText( geo_terreno ) as "Geometria do Terreno"
-FROM terreno
-LEFT JOIN Tipo_Terreno ON terreno.id_tipo_terreno = tipo_terreno.id_tipo_terreno;
+from terreno
+left join tipo_terreno on terreno.id_tipo_terreno = tipo_terreno.id_tipo_terreno;
 
-\echo Objetos Moveis (Animais):
-SELECT 
-    objeto_movel.id_objeto_movel as "ID do Objeto Movel", 
-    objeto_movel.nome as "Nome do Objeto Movel",
-    tipo_objeto_movel.nome as "Tipo do Objeto Movel"
-FROM objeto_movel
-LEFT JOIN tipo_objeto_movel ON objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel;
+\echo
+\echo     * Objetos Moveis:
+select 
+    id_objeto_movel as "ID do Objeto Movel", 
+    tipo_objeto_movel.nome || ' ' || id_objeto_movel as "Nome do Objeto Movel"
+from objeto_movel
+left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel;
 
-\echo Cinematica dos Objetos Moveis: 
-SELECT 
-    objeto_movel.id_objeto_movel as "ID do Objeto Movel", 
-    objeto_movel.nome as "Nome do Objeto Movel" 
-    ST_AsText(cinematica.geo_ponto) as "Posicao",
-    cinematica.orientacao as "Orientacao",
-    cinematica.velocidade as "Velocidade",
+
+\echo
+\echo     * Objetos Cinematica dos Objetos Moveis:
+select 
+    id_objeto_movel as "ID do Objeto Movel", 
+    tipo_objeto_movel.nome || ' ' || id_objeto_movel as "Nome do Objeto Movel", 
+    cinematica.velocidade as "Velocidade", 
     cinematica.aceleracao as "Aceleracao",
-    cinematica.boost as "Boost"
-FROM objeto_movel
-LEFT JOIN tipo_objeto_movel ON objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel
-LEFT JOIN cinematica ON objeto_movel.id_cinematica = cinematica.id_cinematica;
+    cinematica.boost as "Boost", 
+    cinematica.velocidade_maxima as "Max. Velocidade",
+    cinematica.aceleracao_maxima as "Max. Aceleracao" 
+from objeto_movel
+left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel
+left join cinematica on objeto_movel.id_cinematica = cinematica.id_cinematica
+left join terreno on terreno.id_terreno = obter_terreno( cinematica.geo_ponto )
+left join tipo_terreno on terreno.id_tipo_terreno = tipo_terreno.id_tipo_terreno;
 
-\echo Perseguicao:
-SELECT 
-    predador.nome as "Predador",
-    presa.nome as "Presa",
+
+
+\echo
+\echo     * Localizacao dos Objetos Moveis:
+select 
+    id_objeto_movel as "ID do Objeto Movel", 
+    tipo_objeto_movel.nome || ' ' || id_objeto_movel as "Nome do Objeto Movel", 
+    ST_AsText(cinematica.geo_ponto) as "Posicao Atual",
+    tipo_terreno.nome as "Terreno Atual" 
+from objeto_movel
+left join tipo_objeto_movel on objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel
+left join cinematica on objeto_movel.id_cinematica = cinematica.id_cinematica
+left join terreno on terreno.id_terreno = obter_terreno( cinematica.geo_ponto )
+left join tipo_terreno on terreno.id_tipo_terreno = tipo_terreno.id_tipo_terreno;
+
+
+\echo
+\echo     * Afetacao do Tipo de Terreno por Tipo de Objeto Movel:
+select 
+    tipo_objeto_movel.nome as "Tipo do Objeto Movel", 
+    tipo_terreno.nome as "Tipo de Terreno", 
+    coef_atrito as "Coeficiente de Atrito"
+from afetacao_tipo_terreno_tipo_objeto_movel
+left join tipo_terreno on afetacao_tipo_terreno_tipo_objeto_movel.id_tipo_terreno = tipo_terreno.id_tipo_terreno
+left join tipo_objeto_movel on afetacao_tipo_terreno_tipo_objeto_movel.id_tipo_objeto_movel = tipo_objeto_movel.id_tipo_objeto_movel;
+
+
+\echo
+\echo     * Perseguicao dos Objetos Moveis:
+select 
+    tipo_objeto_movel_predador.nome || ' ' || predador.id_objeto_movel as "Predador",
+    tipo_terreno_predador.nome as "Terreno Predador",
     ST_AsText(c_predador.geo_ponto) as "Posicao Predador",
-    ST_AsText(c_presa.geo_ponto) as "Posicao Presa"
-FROM objeto_movel as predador
-LEFT JOIN objeto_movel as presa on predador.id_alvo = presa.id_objeto_movel
-LEFT JOIN cinematica as c_predador on predador.id_cinematica = c_predador.id_cinematica
-LEFT JOIN cinematica as c_presa on presa.id_cinematica = c_presa.id_cinematica
-WHERE predador.id_alvo IS NOT NULL;
+    tipo_objeto_movel_presa.nome || ' ' || presa.id_objeto_movel as "Presa",
+    tipo_terreno_presa.nome as "Terreno Presa",
+    ST_AsText(c_presa.geo_ponto) as "Posicao Presa" 
+from objeto_movel as predador
+left join objeto_movel as presa on predador.id_alvo = presa.id_objeto_movel
+left join tipo_objeto_movel as tipo_objeto_movel_predador on predador.id_tipo_objeto_movel = tipo_objeto_movel_predador.id_tipo_objeto_movel
+left join tipo_objeto_movel as tipo_objeto_movel_presa on presa.id_tipo_objeto_movel = tipo_objeto_movel_presa.id_tipo_objeto_movel
+left join cinematica as c_predador on predador.id_cinematica = c_predador.id_cinematica
+left join cinematica as c_presa on presa.id_cinematica = c_presa.id_cinematica
+left join terreno as terreno_predador on terreno_predador.id_terreno = obter_terreno( c_predador.geo_ponto )
+left join terreno as terreno_presa on terreno_presa.id_terreno = obter_terreno( c_presa.geo_ponto )
+left join tipo_terreno as tipo_terreno_presa on terreno_presa.id_tipo_terreno = tipo_terreno_presa.id_tipo_terreno
+left join tipo_terreno as tipo_terreno_predador on terreno_predador.id_tipo_terreno = tipo_terreno_predador.id_tipo_terreno
+where predador.id_alvo is not null;
+
+
+
 
 

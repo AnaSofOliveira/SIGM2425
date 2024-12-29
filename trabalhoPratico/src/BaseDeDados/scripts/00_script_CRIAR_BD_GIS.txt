@@ -36,7 +36,7 @@
 -- (cf. postgresql-9.3-A4.pdf)
 --_____________________________________
 \echo
-\echo "Remover Base de Dados" :dataBase
+\echo Remover Base de Dados :dataBase
 ;
 DROP DATABASE IF EXISTS :dataBase
 ;
@@ -48,14 +48,14 @@ DROP DATABASE IF EXISTS :dataBase
 -- (cf. postgresql-9.4-A4.pdf)
 --_____________________________________
 \echo
-\echo "Criar Base de Dados" :dataBase
+\echo Criar Base de Dados :dataBase
 ;
 CREATE DATABASE :dataBase
 ;
 
 
 \echo
-\echo "Estabelecer Conexao com a Base de Dados" :dataBase
+\echo Estabelecer Conexao com a Base de Dados :dataBase
 ;
 \c :dataBase :userName :hostName :portNumber
 ;

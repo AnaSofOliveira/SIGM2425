@@ -14,108 +14,126 @@
 \connect :dataBase :userName
 ;
 
+-------------
+-- Nome da BD
+-------------
+\set dataBase fuga_selvagem
+;
+
 -- ========================================
 -- DROP VIEWS
 -- ========================================
-DROP VIEW IF EXISTS v_cinematica_1;
-DROP VIEW IF EXISTS v_trajectoria_1;
 
-DROP VIEW IF EXISTS v_cinematica_2;
-DROP VIEW IF EXISTS v_trajectoria_2;
+\echo 
+\echo -> Eliminar Views
 
-DROP VIEW IF EXISTS v_cinematica_3;
-DROP VIEW IF EXISTS v_trajectoria_3;
-
-DROP VIEW IF EXISTS v_cinematica_4;
-DROP VIEW IF EXISTS v_trajectoria_4;
-
-DROP VIEW IF EXISTS v_cinematica_5;
-DROP VIEW IF EXISTS v_trajectoria_5;
-
-DROP VIEW IF EXISTS v_cinematica_6;
-DROP VIEW IF EXISTS v_trajectoria_6;
-
-DROP VIEW IF EXISTS v_cinematica_7;
-DROP VIEW IF EXISTS v_trajectoria_7;
-
-DROP VIEW IF EXISTS v_cinematica_8;
-DROP VIEW IF EXISTS v_trajectoria_8;
-
-DROP VIEW IF EXISTS v_cinematica_9;
-DROP VIEW IF EXISTS v_trajectoria_9;
-
-
-DROP VIEW IF EXISTS v_lagos;
 DROP VIEW IF EXISTS v_pantanos;
 DROP VIEW IF EXISTS v_cultivos;
+DROP VIEW IF EXISTS v_lagos;
 DROP VIEW IF EXISTS v_florestas;
 
+DROP VIEW IF EXISTS v_cinematica_9;
+DROP VIEW IF EXISTS v_cinematica_8;
+DROP VIEW IF EXISTS v_cinematica_7;
+DROP VIEW IF EXISTS v_cinematica_6;
+DROP VIEW IF EXISTS v_cinematica_5;
+DROP VIEW IF EXISTS v_cinematica_4;
+DROP VIEW IF EXISTS v_cinematica_3;
+DROP VIEW IF EXISTS v_cinematica_2;
+DROP VIEW IF EXISTS v_cinematica_1;
 
+DROP VIEW IF EXISTS v_trajectoria_9;
+DROP VIEW IF EXISTS v_trajectoria_8;
+DROP VIEW IF EXISTS v_trajectoria_7;
+DROP VIEW IF EXISTS v_trajectoria_6;
+DROP VIEW IF EXISTS v_trajectoria_5;
+DROP VIEW IF EXISTS v_trajectoria_4;
+DROP VIEW IF EXISTS v_trajectoria_3;
+DROP VIEW IF EXISTS v_trajectoria_2;
+DROP VIEW IF EXISTS v_trajectoria_1;
+
+-- ========================================
+-- DROP OPERATORS
+-- ========================================
+
+\echo 
+\echo -> Eliminar Operadores
+
+DROP OPERATOR IF EXISTS /(t_vector, real);
+-- DROP OPERATOR IF EXISTS /(real, t_vector);
+DROP OPERATOR IF EXISTS -(geometry, geometry);
+DROP OPERATOR IF EXISTS -(t_vector, t_vector);
+DROP OPERATOR IF EXISTS +(t_vector, t_vector);
+DROP OPERATOR IF EXISTS *(t_vector, real);
+-- DROP OPERATOR IF EXISTS *(real, t_vector);
 
 -- ========================================
 -- DROP FUNCTIONS
 -- ========================================
-drop function if exists obter_terreno( int, geometry );
-DROP FUNCTION IF EXISTS novo_posicao( geometry, t_velocidade, real );
-DROP FUNCTION IF EXISTS novo_orientacao( real, t_velocidade, real );
-DROP FUNCTION IF EXISTS novo_velocidade( t_velocidade, t_aceleracao, real );
 
-drop function if exists novo_aceleracao_linear;
-drop function if exists obter_aceleracao(integer,integer,real,integer);
+\echo 
+\echo -> Eliminar Funcoes
 
-
-DROP VIEW IF EXISTS v_novo_cinematica;
-
+DROP FUNCTION IF EXISTS criar_views_objetos;
+DROP FUNCTION IF EXISTS simular_perseguicao (int);
+DROP FUNCTION IF EXISTS centrar_forma2D (geometry, geometry, double precision);
+DROP FUNCTION IF EXISTS obter_aceleracao (int, int, real, int);
+DROP FUNCTION IF EXISTS novo_aceleracao_linear (objeto_movel, objeto_movel, real);
+DROP FUNCTION IF EXISTS novo_velocidade (t_velocidade, t_aceleracao, real, t_velocidade);
+DROP FUNCTION IF EXISTS novo_orientacao (real, t_velocidade, real);
+DROP FUNCTION IF EXISTS novo_posicao (geometry, t_velocidade, real);
+DROP FUNCTION IF EXISTS obter_terreno (geometry);
+DROP FUNCTION IF EXISTS normalizar (t_vector);
+DROP FUNCTION IF EXISTS divisao_vector_por_escalar (t_vector, real);
+DROP FUNCTION IF EXISTS subtrair_geometry (geometry, geometry);
+DROP FUNCTION IF EXISTS geometry_to_tvector (geometry);
+DROP FUNCTION IF EXISTS subtrair_vector (t_vector, t_vector);
+DROP FUNCTION IF EXISTS soma_vector_vector (t_vector, t_vector);
+DROP FUNCTION IF EXISTS produto_vector_por_escalar (t_vector, real);
 
 -- ========================================
--- DROP MODEL
+-- DROP MODEL (Tables and Constraints)
 -- ========================================
+
+\echo 
+\echo -> Eliminar Modelo (Tabelas e Constraints)
 
 ALTER TABLE objeto_movel DROP CONSTRAINT fk_cinematica;
 ALTER TABLE objeto_movel DROP CONSTRAINT fk_tipo_objeto_movel;
+DROP TABLE IF EXISTS objeto_movel;
 
 ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT pk_afetacao_tipo_terreno_tipo_objeto_movel;
-ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT fk_tipo_terreno;
 ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT fk_tipo_objeto_movel;
+ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT fk_tipo_terreno;
+DROP TABLE IF EXISTS afetacao_tipo_terreno_tipo_objeto_movel;
 
-ALTER TABLE gps_ponto DROP CONSTRAINT fk_gps_ponto_id_terreno;
+DROP TABLE IF EXISTS tipo_objeto_movel;
+
+DROP TABLE IF EXISTS cinematica_hist;
+
+DROP TABLE IF EXISTS cinematica;
 
 ALTER TABLE terreno DROP CONSTRAINT fk_tipo_terreno;
-
-DROP TABLE IF EXISTS objeto_movel;
-DROP TABLE IF EXISTS afetacao_tipo_terreno_tipo_objeto_movel;
-DROP TABLE IF EXISTS tipo_objeto_movel;
-DROP TABLE IF EXISTS cinematica_hist;
-DROP TABLE IF EXISTS cinematica;
-DROP TABLE IF EXISTS gps_ponto;
 DROP TABLE IF EXISTS terreno;
+
 DROP TABLE IF EXISTS tipo_terreno;
 
-
 -- ========================================
--- DROP OPERATORS, FUNCTIONS AND TYPES
+-- DROP TYPES
 -- ========================================
 
-DROP OPERATOR IF EXISTS *( t_vector, real );
-DROP OPERATOR IF EXISTS *( real, t_vector );
-DROP OPERATOR IF EXISTS +( t_vector, t_vector );
-DROP OPERATOR IF EXISTS -( t_vector, t_vector );
-DROP OPERATOR IF EXISTS -( geometry, geometry );
-DROP OPERATOR IF EXISTS /( t_vector, real );
-DROP OPERATOR IF EXISTS /(real,t_vector);
+\echo 
+\echo -> Eliminar Tipos
 
-DROP FUNCTION IF EXISTS produto_vector_por_escalar( t_vector, real );
-DROP FUNCTION IF EXISTS soma_vector_vector( t_vector, t_vector );
-DROP FUNCTION IF EXISTS subtrair_vector( t_vector, t_vector );
-DROP FUNCTION IF EXISTS subtrair_geometry( geometry, geometry );
-DROP FUNCTION IF EXISTS geometry_to_tvector( geometry );
-DROP FUNCTION IF EXISTS normalizar( t_vector );
-DROP FUNCTION IF EXISTS divisao_vector_por_escalar(t_vector,real);
-
-DROP TYPE IF EXISTS t_velocidade;
 DROP TYPE IF EXISTS t_aceleracao;
+DROP TYPE IF EXISTS t_velocidade;
 DROP TYPE IF EXISTS t_vector;
 
+-- ========================================
+-- DROP DATABASE
+-- ========================================
 
-
-
+\echo 
+\echo -> Eliminar Base de Dados :dataBase
+\c postgres
+DROP DATABASE IF EXISTS :dataBase;

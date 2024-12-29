@@ -21,32 +21,34 @@
 -- Criar o Esquema Relacional
 --------------------------------
 
+\echo 
+\echo -> Eliminar Modelo (Tabelas e Constraints)
+
 ALTER TABLE objeto_movel DROP CONSTRAINT fk_cinematica;
 ALTER TABLE objeto_movel DROP CONSTRAINT fk_tipo_objeto_movel;
+DROP TABLE IF EXISTS objeto_movel;
 
 ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT pk_afetacao_tipo_terreno_tipo_objeto_movel;
-ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT fk_tipo_terreno;
 ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT fk_tipo_objeto_movel;
+ALTER TABLE afetacao_tipo_terreno_tipo_objeto_movel DROP CONSTRAINT fk_tipo_terreno;
+DROP TABLE IF EXISTS afetacao_tipo_terreno_tipo_objeto_movel;
 
-ALTER TABLE gps_ponto DROP CONSTRAINT fk_gps_ponto_id_terreno;
+DROP TABLE IF EXISTS tipo_objeto_movel;
+
+DROP TABLE IF EXISTS cinematica_hist;
+
+DROP TABLE IF EXISTS cinematica;
 
 ALTER TABLE terreno DROP CONSTRAINT fk_tipo_terreno;
-
-DROP TABLE IF EXISTS objeto_movel;
-DROP TABLE IF EXISTS afetacao_tipo_terreno_tipo_objeto_movel;
-DROP TABLE IF EXISTS tipo_objeto_movel;
-DROP TABLE IF EXISTS cinematica_hist;
-DROP TABLE IF EXISTS cinematica;
-DROP TABLE IF EXISTS gps_ponto;
 DROP TABLE IF EXISTS terreno;
-DROP TABLE IF EXISTS tipo_terreno;
 
+DROP TABLE IF EXISTS tipo_terreno;
 
 ---------------------------------
 -- TIPO_TERRENO
 ---------------------------------
-\echo Create Table TIPO_TERRENO
-
+\echo
+\echo -> Criar Tabela TIPO_TERRENO
 CREATE TABLE tipo_terreno (
     id_tipo_terreno INTEGER PRIMARY KEY,
     nome VARCHAR(50) NOT NULL
@@ -55,8 +57,9 @@ CREATE TABLE tipo_terreno (
 ---------------------------------
 -- TERRENO
 ---------------------------------
-\echo Create Table TERRENO
 
+\echo
+\echo -> Criar Tabela TERRENO
 CREATE TABLE terreno (
     id_terreno INTEGER PRIMARY KEY, 
     id_tipo_terreno INTEGER NOT NULL, 
@@ -64,25 +67,15 @@ CREATE TABLE terreno (
     CONSTRAINT fk_tipo_terreno FOREIGN KEY(id_tipo_terreno) REFERENCES tipo_terreno(id_tipo_terreno) 
 );
 
+\echo     * Adicionar geometria geo_terreno (GEOMETRY)
 SELECT AddGeometryColumn('public', 'terreno', 'geo_terreno', 0, 'GEOMETRY', 2);
-
----------------------------------
--- GPS_PONTO
----------------------------------
-
-CREATE TABLE gps_ponto (
-    id_ordem INTEGER,
-    id_terreno INTEGER, 
-    CONSTRAINT pk_gps_ponto PRIMARY KEY(id_ordem, id_terreno), 
-    CONSTRAINT fk_gps_ponto_id_terreno FOREIGN KEY(id_terreno) REFERENCES terreno(id_terreno)
-);
-
-SELECT AddGeometryColumn('public', 'gps_ponto', 'g_ponto', 0, 'POINT', 2);
 
 ---------------------------------
 -- CINEMATICA
 ---------------------------------
-\echo Create Table CINEMATICA
+
+\echo
+\echo -> Criar Tabela CINEMATICA
 
 CREATE TABLE cinematica (
     id_cinematica INTEGER PRIMARY KEY, 
@@ -94,12 +87,15 @@ CREATE TABLE cinematica (
     boost real NOT NULL
 );
 
+\echo     * Adicionar geometria geo_ponto (POINT)
 SELECT AddGeometryColumn('public', 'cinematica', 'geo_ponto', 0, 'POINT', 2);
 
 ---------------------------------
 -- CINEMATICA HIST
 ---------------------------------
-\echo Create Table CINEMATICA_HIST
+
+\echo
+\echo -> Criar Tabela CINEMATICA_HIST
 
 CREATE TABLE cinematica_hist (
     id_cinematica_hist SERIAL PRIMARY KEY,
@@ -110,25 +106,30 @@ CREATE TABLE cinematica_hist (
     boost real NOT NULL
 );
 
+\echo     * Adicionar geometria geo_ponto (POINT)
 SELECT AddGeometryColumn('public', 'cinematica_hist', 'geo_ponto', 0, 'POINT', 2);
 
 ---------------------------------
 -- TIPO OBJETO MOVEL
 ---------------------------------
-\echo Create Table TIPO_OBJETO_MOVEL
+
+\echo
+\echo -> Criar Tabela TIPO_OBJETO_MOVEL
 
 CREATE TABLE tipo_objeto_movel (
     id_tipo_objeto_movel INTEGER PRIMARY KEY, 
     nome VARCHAR(255) NOT NULL
 );
 
+\echo     * Adicionar geometria geo_corpo (GEOMETRY)
 SELECT AddGeometryColumn('public', 'tipo_objeto_movel', 'geo_corpo', 0, 'GEOMETRY', 2);
 
 ---------------------------------
 -- AFETACAO TIPO TERRENO - TIPO OBJETO MOVEL
 ---------------------------------
-\echo Create Table AFETACAO_TIPO_TERRENO_TIPO_OBJETO_MOVEL
 
+\echo
+\echo -> Criar Tabela AFETACAO_TIPO_TERRENO_TIPO_OBJETO_MOVEL
 CREATE TABLE afetacao_tipo_terreno_tipo_objeto_movel (
     id_tipo_terreno INTEGER NOT NULL,
     id_tipo_objeto_movel INTEGER NOT NULL,
@@ -141,11 +142,11 @@ CREATE TABLE afetacao_tipo_terreno_tipo_objeto_movel (
 ---------------------------------
 -- OBJETO MOVEL
 ---------------------------------
-\echo Create Table OBJETO_MOVEL
 
+\echo
+\echo -> Criar Tabela OBJETO_MOVEL
 CREATE TABLE objeto_movel (
     id_objeto_movel INTEGER PRIMARY KEY,  
-    nome VARCHAR(255) NOT NULL,
     id_tipo_objeto_movel INTEGER,
     id_cinematica INTEGER NOT NULL,
     id_alvo INTEGER, 
