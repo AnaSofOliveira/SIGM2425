@@ -1,194 +1,216 @@
+
 import tkinter as tk
 from tkinter import ttk
-import geopandas as gpd
-import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from sqlalchemy import create_engine
+from database import PostGis
+import pandas as pd
 
-# Configurações de conexão com o banco de dados
-DB_NAME = "fuga_selvagem"
-DB_USER = "postgres"
-DB_HOST = "localhost"
-DB_PORT = "5432"
-DB_PASSWORD = "postgres"  # Adicione sua senha aqui
 
-# Função para conectar ao banco de dados usando SQLAlchemy
-def connect_db():
-    engine = create_engine(f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}')
-    return engine
+class ZoomController:
 
-# Função para carregar dados de uma view
-def load_view_data(view_name, geom_col):
-    engine = connect_db()
-    query = f"SELECT * FROM {view_name}"
-    df = gpd.read_postgis(query, engine, geom_col=geom_col)
-    return df
+    def setup_zoom_and_drag(self, canvas, ax):
+        def on_press(event):
+            if event.button == 1:
+                canvas.mpl_connect('motion_notify_event', on_drag)
+                canvas.mpl_connect('button_release_event', on_release)
+                on_press.x0, on_press.y0 = event.xdata, event.ydata
 
-# Função para carregar tipos de objetos móveis
-def load_object_types():
-    engine = connect_db()
-    query = "select obj.id_objeto_movel as id, tipo_obj.nome as nome from objeto_movel as obj left join tipo_objeto_movel as tipo_obj on obj.id_tipo_objeto_movel = tipo_obj.id_tipo_objeto_movel"
-    df = pd.read_sql(query, engine)
-    return df
+        def on_release(event):
+            canvas.mpl_disconnect(canvas.mpl_connect('motion_notify_event', on_drag))
+            canvas.mpl_disconnect(canvas.mpl_connect('button_release_event', on_release))
 
-class ZoomPan:
-    def __init__(self, ax):
-        self.ax = ax
-        self.press = None
+        def on_drag(event):
+            if event.inaxes and event.button == 1:
+                dx = event.xdata - on_press.x0
+                dy = event.ydata - on_press.y0
+                xlim = ax.get_xlim()
+                ylim = ax.get_ylim()
+                ax.set_xlim(xlim[0] - dx, xlim[1] - dx)
+                ax.set_ylim(ylim[0] - dy, ylim[1] - dy)
+                canvas.draw()
 
-# Lista global para armazenar as seleções
-selected_objects = []
+        def on_zoom(event):
+            if event.inaxes:
+                scale_factor = 0.9 if event.button == 'up' else 1.1
+                xlim = ax.get_xlim()
+                ylim = ax.get_ylim()
+                ax.set_xlim([x * scale_factor for x in xlim])
+                ax.set_ylim([y * scale_factor for y in ylim])
+                canvas.draw()
 
-# Função para criar a interface gráfica
-def create_gui():
-    global graph_frame  # Definir graph_frame como global
-    root = tk.Tk()
-    root.title("Fuga Selvagem - Trajetórias e Cinemáticas")
+        canvas.mpl_connect('button_press_event', on_press)
+        canvas.mpl_connect('scroll_event', on_zoom)
 
-    # Definir o ícone da aplicação
-    icon_path = r"C:\Users\ana.sofia.oliveira\Documents\ISEL\SIGM2425\trabalhoPratico\src\interface\imgs\postgres.ico"
-    root.iconbitmap(icon_path)
 
-    paned_window = ttk.PanedWindow(root, orient=tk.HORIZONTAL)
-    paned_window.pack(fill=tk.BOTH, expand=1)
+class ControllerGui:
 
-    # Área para checkboxes (15%)
-    control_frame = tk.Frame(paned_window)
-    paned_window.add(control_frame, weight=1)
-    create_controls(control_frame)
+    def __init__(self):
+        self.db = PostGis()
+        self.zoom_controller = ZoomController()
 
-    # Área do gráfico (85%)
-    global graph_frame
-    graph_frame = tk.Frame(paned_window)
-    paned_window.add(graph_frame, weight=4)
-    update_plot()
+    def start(self):
+        self.selected_objects = []
+        self.db.connect()
+    
+    def stop(self):
+        self.db.disconnect()
 
-    root.mainloop()
+    def on_checkbox_toggle(self,obj_id, var, frame):
+        if var.get():
+            self.selected_objects.append(obj_id)
+        else:
+            self.selected_objects.remove(obj_id)
+        self.update_plot(frame)
 
-# Função para criar os checkboxes
-def create_controls(frame):
-    tk.Label(frame, text="Selecione o Animal", font=('Arial', 20)).pack()
-    object_types = load_object_types()
-    for _, row in object_types.iterrows():
-        obj_id = row['id']
-        obj_name = row['nome']
-        var = tk.BooleanVar()
-        chk = tk.Checkbutton(frame, text=f'{obj_name} ({obj_id})', variable=var, command=lambda id=obj_id, var=var: on_checkbox_toggle(id, var), anchor='w', font=('Arial', 12))
-        chk.pack()
+    def clear_plots(self, frame):
+        for widget in frame.winfo_children():
+            widget.destroy()
+    
 
-# Função chamada quando uma checkbox é selecionada/deselecionada
-def on_checkbox_toggle(obj_id, var):
-    global selected_objects
-    if var.get():
-        selected_objects.append(obj_id)
-    else:
-        selected_objects.remove(obj_id)
-    update_plot()
+    def plot_terrain(self, frame_or_ax):
+        fig, ax = (None, frame_or_ax)
+        #plt.subplots(figsize=(20, 20)) if isinstance(frame_or_ax, tk.Frame) else
+        # Carregar dados das vistas e definir cores específicas
+        views = {
+            'v_florestas': '#228B22',  # fresh green
+            'v_lagos': '#ADD8E6',      # light blue
+            'v_cultivos': '#FFD700',   # dark yellow
+            'v_pantanos': '#8B4513'    # dark brown
+        }
+        for view, colors in views.items():
+            try:
+                df = self.load_view_data(view, 'geo_terreno')
+                if not df.empty and df.geometry.is_valid.all():
+                    print("Terrenos:\n", df)
+                    df.plot(ax=ax, color=colors)
+            except Exception as e:
+                print(f"Error loading view {view}: {e}")
 
-# Função para atualizar o gráfico com base nas seleções
-def update_plot():
-    clear_plots()
-    fig, ax = plt.subplots(figsize=(6, 10))
-    canvas = FigureCanvasTkAgg(fig, master=graph_frame)
-    plot_trajectory_and_kinematics(selected_objects, canvas, ax)
-    ax.set_xticks([])  # Remover valores do eixo x
-    ax.set_yticks([])  # Remover valores do eixo y
-    setup_zoom_and_drag(canvas, ax)
-
-# Função para plotar a trajetória e cinemática
-def plot_trajectory_and_kinematics(selected_objects, canvas, ax):
-    # Plotar terreno
-    print("Plotting terrain")
-    plot_terrain(ax)
-
-    for obj_id in selected_objects:
-
-        # Plotar trajetória
-        print("Plotting trajectory")
-        traj_view = f"v_trajectoria_{obj_id}"
-        traj_df = load_view_data(traj_view, 'geo_ponto')
-        if not traj_df.empty:
-            print("Trajetórias:\n", traj_df)
-            traj_df.plot(ax=ax, color='red', label=f'Trajectory {obj_id}', aspect=1)
-
-        # Plotar cinemática
-        print("Plotting kinematics")
-        kin_view = f"v_cinematica_{obj_id}"
-        corpo_df = load_view_data(kin_view, 'geo_corpo')
-        posicao_df = load_view_data(kin_view, 'g_posicao')
-        pos = posicao_df['g_posicao'][0]
-        if not corpo_df.empty and corpo_df.geometry.is_valid.all():
-            corpo_df.plot(ax=ax, color='black', label=f'Kinematics {obj_id}', aspect=1)
-            ax.text(pos.x+20, pos.y+20, f'({round(pos.x, 2)}, {round(pos.y, 2)})', fontsize=8, ha='center')
-
-    print("Drawing canvas")
-    canvas.draw()
-    canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)
-
-# Função para limpar os gráficos
-def clear_plots():
-    for widget in graph_frame.winfo_children():
-        widget.destroy()
-
-# Função para configurar eventos de zoom e drag
-def setup_zoom_and_drag(canvas, ax):
-    def on_press(event):
-        if event.button == 1:
-            canvas.mpl_connect('motion_notify_event', on_drag)
-            canvas.mpl_connect('button_release_event', on_release)
-            on_press.x0, on_press.y0 = event.xdata, event.ydata
-
-    def on_release(event):
-        canvas.mpl_disconnect(canvas.mpl_connect('motion_notify_event', on_drag))
-        canvas.mpl_disconnect(canvas.mpl_connect('button_release_event', on_release))
-
-    def on_drag(event):
-        if event.inaxes and event.button == 1:
-            dx = event.xdata - on_press.x0
-            dy = event.ydata - on_press.y0
-            xlim = ax.get_xlim()
-            ylim = ax.get_ylim()
-            ax.set_xlim(xlim[0] - dx, xlim[1] - dx)
-            ax.set_ylim(ylim[0] - dy, ylim[1] - dy)
+        if fig:
+            canvas = FigureCanvasTkAgg(fig, master=frame_or_ax)
             canvas.draw()
+            canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)
 
-    def on_zoom(event):
-        if event.inaxes:
-            scale_factor = 1.1 if event.button == 'up' else 0.9
-            xlim = ax.get_xlim()
-            ylim = ax.get_ylim()
-            ax.set_xlim([x * scale_factor for x in xlim])
-            ax.set_ylim([y * scale_factor for y in ylim])
-            canvas.draw()
 
-    canvas.mpl_connect('button_press_event', on_press)
-    canvas.mpl_connect('scroll_event', on_zoom)
+    # Função para plotar a trajetória e cinemática
+    def plot_trajectory_and_kinematics(self, selected_objects, ax):
+        # Plotar terreno
+        print("Plotting terrain")
+        self.plot_terrain(ax)
 
-# Função para plotar o terreno
-def plot_terrain(frame_or_ax):
-    fig, ax = plt.subplots(figsize=(6, 10)) if isinstance(frame_or_ax, tk.Frame) else (None, frame_or_ax)
+        for obj_id in selected_objects:
 
-    # Carregar dados das vistas e definir cores específicas
-    views = {
-        'v_florestas': '#228B22',  # fresh green
-        'v_lagos': '#ADD8E6',      # light blue
-        'v_cultivos': '#FFD700',   # dark yellow
-        'v_pantanos': '#8B4513'    # dark brown
-    }
-    for view, colors in views.items():
-        try:
-            df = load_view_data(view, 'geo_terreno')
-            if not df.empty and df.geometry.is_valid.all():
-                print("Terrenos:\n", df)
-                df.plot(ax=ax, color=colors)
-        except Exception as e:
-            print(f"Error loading view {view}: {e}")
+            # Plotar trajetória
+            print("Plotting trajectory")
+            traj_view = f"v_trajectoria_{obj_id}"
+            traj_df = self.load_view_data(traj_view, 'geo_ponto')
+            if not traj_df.empty:
+                print("Trajetórias:\n", traj_df)
+                traj_df.plot(ax=ax, color='red', label=f'Trajectory {obj_id}', aspect=1)
+            
+            # Plotar cinemática
+            print("Plotting kinematics")
+            kin_view = f"v_cinematica_{obj_id}"
+            corpo_df = self.load_view_data(kin_view, 'geo_corpo')
+            posicao_df = self.load_view_data(kin_view, 'g_posicao')
+            pos = posicao_df['g_posicao'][0]
+            if not corpo_df.empty and corpo_df.geometry.is_valid.all():
+                corpo_df.plot(ax=ax, color='black', label=f'Kinematics {obj_id}', aspect=1)
+                ax.text(pos.x+20, pos.y+20, f'({round(pos.x, 2)}, {round(pos.y, 2)})', fontsize=8, ha='center')
 
-    if fig:
-        canvas = FigureCanvasTkAgg(fig, master=frame_or_ax)
+    def update_plot(self, frame):
+        self.clear_plots(frame)
+
+        fig, ax = plt.subplots() #figsize=(10, 10)
+        fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+        canvas = FigureCanvasTkAgg(fig, master=frame)
+        self.plot_trajectory_and_kinematics(self.selected_objects, ax)
+        ax.set_xticks([])  # Remover valores do eixo x
+        ax.set_yticks([])  # Remover valores do eixo y
+        ax.set_aspect('auto')
+        ax.axis('off')
+        self.zoom_controller.setup_zoom_and_drag(canvas, ax)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=1)
 
+    def on_submit(self, ni, frame):
+        print("Atualizando gráfico", ni)
+        self.db.simular_perseguicao(ni)
+        self.update_plot(frame)
+
+    def load_object_types(self):
+        return self.db.get_objetos_types()
+    
+    def load_view_data(self, view_name, geom_col):
+        return self.db.get_view(view_name, geom_col)
+
+
+class GUI:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.controller = ControllerGui()
+    
+    def create(self, icon_path):
+        self.controller.start()
+        self.root.title("Fuga Selvagem - Trajetórias e Cinemáticas")
+
+        # Definir o ícone da aplicação
+        self.root.iconbitmap(icon_path)
+
+        self.paned_window = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
+        self.paned_window.pack(fill=tk.BOTH, expand=1)
+        self.__create_checkbox()
+        self.__create_map()
+        
+
+    def start(self):
+        self.root.mainloop()
+
+    def destroy(self):
+        self.controller.stop()
+
+    def __create_checkbox(self):
+        # Área para checkboxes (15%)
+        control_frame = tk.Frame(self.paned_window)
+        self.paned_window.add(control_frame, weight=1)
+        self.__create_controls(control_frame)
+
+    def __create_map(self):
+        # Área do gráfico (85%)
+        self.graph_frame = tk.Frame(self.paned_window)
+        self.paned_window.add(self.graph_frame, weight=4)
+        self.controller.update_plot(self.graph_frame)
+
+    def __create_controls(self, frame):
+        tk.Label(frame, text="Selecione o Animal", font=('Arial', 20)).pack()
+        object_types = self.controller.load_object_types()
+        for _, row in object_types.iterrows():
+            obj_id = row['id']
+            obj_name = row['nome']
+            var = tk.BooleanVar()
+            chk = tk.Checkbutton(frame, text=f'{obj_name} (ID: {obj_id})', variable=var, command=lambda id=obj_id, var=var: self.controller.on_checkbox_toggle(id, var, self.graph_frame), anchor='w', font=('Arial', 12))
+            chk.pack(anchor='w', padx=16)
+
+
+        submit_button = tk.Button(frame, text="Atualizar", command=lambda : self.controller.on_submit(text_input.get(),self.graph_frame), font=('Arial', 12))
+        submit_button.pack(pady=16, side=tk.BOTTOM)
+
+        text_input = tk.Entry(frame, font=('Arial', 12))
+        text_input.insert(10, "10")
+        text_input.pack(side=tk.BOTTOM , padx=16, pady=8)
+
+        tk.Label(frame, text="Número de Iterações", font=('Arial', 16)).pack(side=tk.BOTTOM)
+
+        divider = tk.Frame(frame, height=2, bd=1, relief=tk.SUNKEN)
+        divider.pack(fill=tk.X, side=tk.BOTTOM, pady=16)
+        
+
 if __name__ == "__main__":
-    create_gui()
+    icon_path = r"C:\Users\A40610\Desktop\SIGM2425\trabalhoPratico\src\interface\imgs\postgres.ico"
+    #icon_path = r"C:\Users\ana.sofia.oliveira\Documents\ISEL\SIGM2425\trabalhoPratico\src\interface\imgs\postgres.ico"
+    gui = GUI()
+    gui.create(icon_path)
+    gui.start()
+
+
