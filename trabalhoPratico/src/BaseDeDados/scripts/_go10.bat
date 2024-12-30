@@ -1,1 +1,0 @@
-_go 10_script_DROP_MODEL.txt
