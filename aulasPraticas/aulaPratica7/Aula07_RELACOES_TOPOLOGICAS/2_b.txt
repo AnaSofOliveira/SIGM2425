@@ -1,0 +1,3 @@
+A tabela geo_0d pode ser representada como pontos de interesse;
+A tabela geo_1d pode ser representada como caminhos, estradas ou rios;
+A tabela geo_2d pode ser representada como areas onde consiste os pontos de interesse, e estradas como as proprias areas;

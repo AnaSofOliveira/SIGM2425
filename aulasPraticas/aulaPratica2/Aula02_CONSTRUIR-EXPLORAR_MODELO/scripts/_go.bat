@@ -4,7 +4,7 @@ set psqlPath="C:\Program Files\PostgreSQL\16\bin"
 
 
 :: Base de Dados, nome do utilizador e porto
-SET dataBase=postgres
+SET dataBase=my_gis
 SET userName=postgres
 SET portNumber=5432
 
