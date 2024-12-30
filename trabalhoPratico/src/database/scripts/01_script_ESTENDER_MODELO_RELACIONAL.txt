@@ -1,0 +1,239 @@
+--#############
+--# Grupo 04
+--#############
+
+
+--=============
+-- Ligacao a BD
+--=============
+\set dataBase fuga_selvagem
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+----------------------------------------------------
+----------------------------------------------------
+-- Estender o Modelo Relacional com Novas Estruturas
+----------------------------------------------------
+----------------------------------------------------
+
+\echo -> Eliminar Operadores
+DROP OPERATOR IF EXISTS /(t_vector, real);
+DROP OPERATOR IF EXISTS /(real, t_vector);
+DROP OPERATOR IF EXISTS -(geometry, geometry);
+DROP OPERATOR IF EXISTS -(t_vector, t_vector);
+DROP OPERATOR IF EXISTS +(t_vector, t_vector);
+DROP OPERATOR IF EXISTS *(t_vector, real);
+DROP OPERATOR IF EXISTS *(real, t_vector);
+
+\echo 
+\echo -> Eliminar Funcoes
+DROP FUNCTION IF EXISTS criar_views_objetos;
+DROP FUNCTION IF EXISTS simular_perseguicao (int);
+DROP FUNCTION IF EXISTS centrar_forma2D (geometry, geometry, double precision);
+DROP FUNCTION IF EXISTS obter_aceleracao (int, int, real, int);
+DROP FUNCTION IF EXISTS novo_aceleracao_linear (objeto_movel, objeto_movel, real);
+DROP FUNCTION IF EXISTS novo_velocidade (t_velocidade, t_aceleracao, real, t_velocidade);
+DROP FUNCTION IF EXISTS novo_orientacao (real, t_velocidade, real);
+DROP FUNCTION IF EXISTS novo_posicao (geometry, t_velocidade, real);
+DROP FUNCTION IF EXISTS obter_terreno (geometry);
+DROP FUNCTION IF EXISTS normalizar (t_vector);
+DROP FUNCTION IF EXISTS divisao_vector_por_escalar (t_vector, real);
+DROP FUNCTION IF EXISTS subtrair_geometry (geometry, geometry);
+DROP FUNCTION IF EXISTS geometry_to_tvector (geometry);
+DROP FUNCTION IF EXISTS subtrair_vector (t_vector, t_vector);
+DROP FUNCTION IF EXISTS soma_vector_vector (t_vector, t_vector);
+DROP FUNCTION IF EXISTS produto_vector_por_escalar (t_vector, real);
+
+\echo
+\echo -> Eliminar Tipos
+DROP TYPE IF EXISTS t_aceleracao;
+DROP TYPE IF EXISTS t_velocidade;
+DROP TYPE IF EXISTS t_vector;
+
+----------------------------------------------------
+----------------------------------------------------
+-- Estender o Modelo Relacional com Novos Tipos
+----------------------------------------------------
+----------------------------------------------------
+\echo
+\echo -> Criar Tipos
+\echo     * t_vector
+CREATE TYPE t_vector AS (
+    x REAL, 
+    y REAL
+);
+
+\echo     * t_velocidade
+CREATE TYPE t_velocidade AS (
+    linear t_vector, 
+    angular REAL
+);
+
+\echo     * t_aceleracao
+CREATE TYPE t_aceleracao AS (
+    linear t_vector, 
+    angular REAL
+);
+
+
+----------------------------------------------------
+----------------------------------------------------
+-- Estender o Modelo Relacional com Novas Funcoes e Operadores
+----------------------------------------------------
+----------------------------------------------------
+\echo
+\echo -> Criar Funcoes e Operadores
+\echo     * Funcao produto_vector_por_escalar (t_vector, real)
+CREATE OR REPLACE FUNCTION produto_vector_por_escalar( vec t_vector, v real )
+RETURNS t_vector
+AS $$
+DECLARE
+    new_x real;
+    new_y real;
+BEGIN
+    new_x := vec.x * v;
+    new_y := vec.y * v;
+    RETURN (new_x, new_y);
+END;
+$$ LANGUAGE plpgsql;
+
+\echo     * Operador * (t_vector, real)
+CREATE OPERATOR * (
+    leftarg = t_vector,
+    rightarg = real,
+    procedure = produto_vector_por_escalar,
+    commutator = *
+);
+
+----------------------------------------------------
+
+\echo     * Funcao soma_vector_vector (t_vector, t_vector)
+CREATE OR REPLACE FUNCTION soma_vector_vector( vec_a t_vector, vec_b t_vector )
+RETURNS t_vector
+AS $$
+DECLARE
+    new_x real;
+    new_y real;
+BEGIN
+    new_x := vec_a.x + vec_b.x;
+    new_y := vec_a.y + vec_b.y;
+    RETURN (new_x, new_y);
+END;
+$$ LANGUAGE plpgsql;
+
+\echo     * Operador + (t_vector, t_vector)
+CREATE OPERATOR + (
+    leftarg = t_vector,
+    rightarg = t_vector,
+    procedure = soma_vector_vector,
+    commutator = +
+);
+
+----------------------------------------------------
+
+\echo     * Funcao subtrair_vector (t_vector, t_vector)
+CREATE OR REPLACE FUNCTION subtrair_vector( vec_a t_vector, vec_b t_vector )
+RETURNS t_vector
+AS $$
+DECLARE
+    new_x real;
+    new_y real;
+BEGIN
+    new_x := vec_a.x - vec_b.x;
+    new_y := vec_a.y - vec_b.y;
+    RETURN (new_x, new_y);
+END;
+$$ LANGUAGE plpgsql;
+
+\echo     * Operador - (t_vector, t_vector)
+CREATE OPERATOR - (
+    leftarg = t_vector,
+    rightarg = t_vector,
+    procedure = subtrair_vector,
+    commutator = -
+);
+
+----------------------------------------------------
+
+\echo     * Funcao geometry_to_tvector (geometry)
+CREATE OR REPLACE FUNCTION geometry_to_tvector(geom geometry)
+RETURNS t_vector
+AS $$
+DECLARE
+    x REAL;
+    y REAL;
+BEGIN
+    x := ST_X(geom);
+    y := ST_Y(geom);
+    RETURN (x, y);
+END;
+$$ LANGUAGE plpgsql;
+
+\echo     * Funcao subtrair_geometry (geometry, geometry)
+CREATE OR REPLACE FUNCTION subtrair_geometry( geo_a geometry, geo_b geometry )
+RETURNS t_vector
+AS $$
+SELECT
+    geometry_to_tvector(geo_a) - geometry_to_tvector(geo_b) AS v
+;
+$$ LANGUAGE 'sql';
+
+\echo     * Operador - (geometry, geometry)
+CREATE OPERATOR - (
+    leftarg = geometry,
+    rightarg = geometry,
+    procedure = subtrair_geometry,
+    commutator = -
+);
+
+----------------------------------------------------
+
+\echo     * Funcao divisao_vector_por_escalar (t_vector, real)
+CREATE OR REPLACE FUNCTION divisao_vector_por_escalar( vec t_vector, v real )
+RETURNS t_vector
+AS $$
+DECLARE
+    new_x real;
+    new_y real;
+BEGIN
+    new_x := vec.x / v;
+    new_y := vec.y / v;
+    RETURN (new_x, new_y);
+END;
+$$ LANGUAGE plpgsql;
+
+\echo     * Operador / (t_vector, real)
+CREATE OPERATOR / (
+    leftarg = t_vector,
+    rightarg = real,
+    procedure = divisao_vector_por_escalar,
+    commutator = /
+);
+
+----------------------------------------------------
+
+\echo     * Funcao normalizar (t_vector)
+CREATE OR REPLACE FUNCTION normalizar( vec t_vector )
+RETURNS t_vector
+AS $$
+DECLARE
+    norma real;
+    new_x real;
+    new_y real;
+BEGIN
+    norma := sqrt(power(vec.x, 2) + power(vec.y, 2));
+	new_x := vec.x / norma;
+	new_y := vec.y / norma;
+    RETURN (new_x, new_y);
+END;
+$$ LANGUAGE plpgsql;
+
+
+
