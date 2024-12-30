@@ -36,6 +36,7 @@ DROP TABLE IF EXISTS afetacao_tipo_terreno_tipo_objeto_movel;
 DROP TABLE IF EXISTS tipo_objeto_movel;
 
 DROP TABLE IF EXISTS cinematica_hist;
+ALTER TABLE cinematica_hist DROP CONSTRAINT fk_cinematica;
 
 DROP TABLE IF EXISTS cinematica;
 
@@ -103,7 +104,8 @@ CREATE TABLE cinematica_hist (
     orientacao REAL NOT NULL,
     velocidade t_velocidade NOT NULL,
     aceleracao t_aceleracao NOT NULL,
-    boost real NOT NULL
+    boost real NOT NULL,
+    CONSTRAINT fk_cinematica FOREIGN KEY(id_cinematica) REFERENCES cinematica(id_cinematica)
 );
 
 \echo     * Adicionar geometria geo_ponto (POINT)

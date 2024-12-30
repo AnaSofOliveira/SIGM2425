@@ -60,12 +60,12 @@ DROP VIEW IF EXISTS v_trajectoria_1;
 \echo -> Eliminar Operadores
 
 DROP OPERATOR IF EXISTS /(t_vector, real);
--- DROP OPERATOR IF EXISTS /(real, t_vector);
+DROP OPERATOR IF EXISTS /(real, t_vector);
 DROP OPERATOR IF EXISTS -(geometry, geometry);
 DROP OPERATOR IF EXISTS -(t_vector, t_vector);
 DROP OPERATOR IF EXISTS +(t_vector, t_vector);
 DROP OPERATOR IF EXISTS *(t_vector, real);
--- DROP OPERATOR IF EXISTS *(real, t_vector);
+DROP OPERATOR IF EXISTS *(real, t_vector);
 
 -- ========================================
 -- DROP FUNCTIONS
@@ -110,6 +110,7 @@ DROP TABLE IF EXISTS afetacao_tipo_terreno_tipo_objeto_movel;
 DROP TABLE IF EXISTS tipo_objeto_movel;
 
 DROP TABLE IF EXISTS cinematica_hist;
+ALTER TABLE cinematica_hist DROP CONSTRAINT fk_cinematica;
 
 DROP TABLE IF EXISTS cinematica;
 

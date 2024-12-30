@@ -4,8 +4,8 @@ import os
 DATABASE_CONFIG_PATH: Final = os.path.join(os.path.dirname(__file__), 'database.json')
 
 APP_NAME: Final = 'Fuga Selvagem - Trajetórias e Cinemáticas'
-# ICON_PATH: Final = r"C:\Users\A40610\Desktop\SIGM2425\trabalhoPratico\src\interface\imgs\postgres.ico"
-ICON_PATH: Final = r"C:\Users\ana.sofia.oliveira\Documents\ISEL\SIGM2425\trabalhoPratico\imgs\postgres.ico"
+# ICON_PATH: Final = r"C:\Users\A40610\Desktop\SIGM2425\trabalhoPratico\src\imgs\postgres.ico"
+ICON_PATH: Final = r"C:\Users\ana.sofia.oliveira\Documents\ISEL\SIGM2425\trabalhoPratico\src\imgs\postgres.ico"
 
 TEXT_SIZE: Final = 20
 FONT_FAMILY: Final = 'Arial'
