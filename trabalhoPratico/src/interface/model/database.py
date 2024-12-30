@@ -4,7 +4,7 @@ import json
 import os
 from config.config import DATABASE_CONFIG_PATH
 
-class Database2:
+class Database:
 
     def __init__(self):
 

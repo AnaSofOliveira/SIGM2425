@@ -2,9 +2,9 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 import geopandas as gpd
 import numpy as np
-from model.database import Database2
+from model.database import Database
 
-class PostGis(Database2):
+class PostGis(Database):
 
     def __init__(self):
         super().__init__()
