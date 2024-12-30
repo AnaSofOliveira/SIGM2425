@@ -1,0 +1,25 @@
+a) 
+	https://tile.openstreetmap.org/0/0/0.png
+b) 
+	https://tile.openstreetmap.org/1/0/0.png
+c) 
+	https://tile.openstreetmap.org/2/1/1.png
+d) 
+	Tiles:
+		(3,2) -> https://tile.openstreetmap.org/3/3/2.png
+		(3,3) -> https://tile.openstreetmap.org/3/3/3.png
+e)
+	zoom 4:
+		(7,5) -> https://tile.openstreetmap.org/4/7/5.png
+		(7,6) -> https://tile.openstreetmap.org/4/7/6.png
+	zoom 5 ->
+		(15,11) -> https://tile.openstreetmap.org/5/15/11.png
+		(15,12) -> https://tile.openstreetmap.org/5/15/12.png
+	zoom 6 -> 	
+		(30,23) -> https://tile.openstreetmap.org/6/30/23.png
+		(30,24) -> https://tile.openstreetmap.org/6/30/24.png
+f)
+	https://tile.openstreetmap.org/9/243/196.png
+g)
+	https://tile.openstreetmap.org/13/3888/3137.png
+	
