@@ -1,1 +1,0 @@
-_go 09_script_TESTES_COMPORTAMENTO.txt

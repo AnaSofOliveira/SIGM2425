@@ -1,1 +1,0 @@
-_go 01_script_ESTENDER_MODELO_RELACIONAL.txt 

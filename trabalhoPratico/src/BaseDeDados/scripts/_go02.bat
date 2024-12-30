@@ -1,1 +1,0 @@
-_go 02_script_CRIAR_MODELO.txt
