@@ -1,0 +1,56 @@
+=====//\\=====//\\=====//\\=====//\\=====//\\=====//\\
+usar o campo de pesquisa assumido por omissao
+=====//\\=====//\\=====//\\=====//\\=====//\\=====//\\
+
+
+O Meu Interrogador!
+Campo = { titulo, autor, tema, conteudo } [conteudo] 
+? > %conteudo%
+
+? > %rei%
+
+[1] "O rato e o rei"; "Desconhecido & Popular"; "destrava línguas"
+C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_A.txt [Thu Nov 30 15:54:00 GMT 2017]
+
+[2] "A vida"; "Gato & Rato & Rei"; "crónica"
+C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_B.txt [Thu Nov 30 15:54:00 GMT 2017]
+
+Numero de documentos encontrados: 2
+
+
+
+=====//\\=====//\\=====//\\=====//\\=====//\\=====//\\
+indicar explicitamente o campo de pesquisa
+=====//\\=====//\\=====//\\=====//\\=====//\\=====//\\
+
+
+O Meu Interrogador!
+Campo = { titulo, autor, tema, conteudo } [conteudo] 
+? > %tema%
+
+? > %destrava%
+
+[1] "O rato e o rei"; "Desconhecido & Popular"; "destrava línguas"
+C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_A.txt [Thu Nov 30 15:54:00 GMT 2017]
+
+Numero de documentos encontrados: 1
+
+
+
+=====//\\=====//\\=====//\\=====//\\=====//\\=====//\\
+outra forma de explicitar o campo de pesquisa:
+campo:termo
+=====//\\=====//\\=====//\\=====//\\=====//\\=====//\\
+
+
+O Meu Interrogador!
+Campo = { titulo, autor, tema, conteudo } [conteudo] 
+? > %conteudo%
+
+? > %tema:destrava%
+
+[1] "O rato e o rei"; "Desconhecido & Popular"; "destrava línguas"
+C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_A.txt [Thu Nov 30 15:54:00 GMT 2017]
+
+Numero de documentos encontrados: 1
+

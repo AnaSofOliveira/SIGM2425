@@ -1,0 +1,50 @@
+< desconhecido, campo="autor", df=1 >
+< gato, campo="autor", df=1 >
+< kusturika, campo="autor", df=1 >
+< popular, campo="autor", df=1 >
+< rato, campo="autor", df=1 >
+< rei, campo="autor", df=1 >
+< branco, campo="conteudo", df=1 >
+< ficou, campo="conteudo", df=1 >
+< filme, campo="conteudo", df=1 >
+< garrafão, campo="conteudo", df=1 >
+< gato, campo="conteudo", df=2 >
+< imagens, campo="conteudo", df=1 >
+< kusturika, campo="conteudo", df=1 >
+< palácio, campo="conteudo", df=1 >
+< preto, campo="conteudo", df=1 >
+< rato, campo="conteudo", df=2 >
+< rei, campo="conteudo", df=2 >
+< roeu, campo="conteudo", df=1 >
+< rolha, campo="conteudo", df=1 >
+< rússia, campo="conteudo", df=1 >
+< surrealistas, campo="conteudo", df=1 >
+< vivem, campo="conteudo", df=1 >
+< zangado, campo="conteudo", df=1 >
+< C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_A.txt, campo="localizacao", df=1 >
+< C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_B.txt, campo="localizacao", df=1 >
+< C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_C.txt, campo="localizacao", df=1 >
+< crónica, campo="tema", df=1 >
+< destrava, campo="tema", df=1 >
+< estrangeiro, campo="tema", df=1 >
+< filme, campo="tema", df=1 >
+< línguas, campo="tema", df=1 >
+< branco, campo="titulo", df=1 >
+< gato, campo="titulo", df=1 >
+< preto, campo="titulo", df=1 >
+< rato, campo="titulo", df=1 >
+< rei, campo="titulo", df=1 >
+< vida, campo="titulo", df=1 >
+< 201711301554, campo="ultimaDataDeEscrita", df=3 >
+
+===== // =====
+
+
+C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_A.txt
+[ <ficou, 1, |13|>, <garrafão, 1, |6|>, <rato, 1, |1|>, <rei, 2, |8,12|>, <roeu, 1, |2|>, <rolha, 1, |4|>, <rússia, 1, |10|>, <zangado, 1, |14|> ]
+
+C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_B.txt
+[ <gato, 1, |1|>, <palácio, 1, |7|>, <rato, 1, |4|>, <rei, 1, |9|>, <vivem, 1, |5|> ]
+
+C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_C.txt
+[ <branco, 1, |1|>, <filme, 1, |6|>, <gato, 2, |0,2|>, <imagens, 1, |10|>, <kusturika, 1, |8|>, <preto, 1, |3|>, <surrealistas, 1, |11|> ]
