@@ -1,0 +1,1 @@
+a) Ao alterar o nome, o search mantem-se com o mesmo resultado, mesmo depois do nome já não existir naquele ficheiro.  

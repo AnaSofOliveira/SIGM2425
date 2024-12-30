@@ -1,0 +1,56 @@
+< desconhecido, campo="autor", df=1 >
+< gato, campo="autor", df=1 >
+< kusturika, campo="autor", df=1 >
+< popular, campo="autor", df=1 >
+< rato, campo="autor", df=1 >
+< rei, campo="autor", df=1 >
+< a, campo="conteudo", df=1 >
+< branco, campo="conteudo", df=1 >
+< com, campo="conteudo", df=1 >
+< da, campo="conteudo", df=1 >
+< de, campo="conteudo", df=1 >
+< do, campo="conteudo", df=2 >
+< e, campo="conteudo", df=1 >
+< ficou, campo="conteudo", df=1 >
+< filme, campo="conteudo", df=1 >
+< garrafão, campo="conteudo", df=1 >
+< gato, campo="conteudo", df=2 >
+< imagens, campo="conteudo", df=1 >
+< kusturika, campo="conteudo", df=1 >
+< no, campo="conteudo", df=1 >
+< o, campo="conteudo", df=2 >
+< palácio, campo="conteudo", df=1 >
+< preto, campo="conteudo", df=1 >
+< rato, campo="conteudo", df=2 >
+< rei, campo="conteudo", df=2 >
+< roeu, campo="conteudo", df=1 >
+< rolha, campo="conteudo", df=1 >
+< rússia, campo="conteudo", df=1 >
+< surrealistas, campo="conteudo", df=1 >
+< um, campo="conteudo", df=1 >
+< vivem, campo="conteudo", df=1 >
+< zangado, campo="conteudo", df=1 >
+< é, campo="conteudo", df=1 >
+< C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_A.txt, campo="localizacao", df=1 >
+< C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_B.txt, campo="localizacao", df=1 >
+< C:\Users\ptrigo\Documents\CSI_SIGM_2017_18\Aula08_sistemaLucene\_sistemaCompleto\src_myRI\oArtigo_C.txt, campo="localizacao", df=1 >
+< crónica, campo="tema", df=1 >
+< destrava, campo="tema", df=1 >
+< estrangeiro, campo="tema", df=1 >
+< filme, campo="tema", df=1 >
+< línguas, campo="tema", df=1 >
+< a, campo="titulo", df=1 >
+< branco, campo="titulo", df=1 >
+< e, campo="titulo", df=1 >
+< gato, campo="titulo", df=1 >
+< o, campo="titulo", df=1 >
+< preto, campo="titulo", df=1 >
+< rato, campo="titulo", df=1 >
+< rei, campo="titulo", df=1 >
+< vida, campo="titulo", df=1 >
+< 201711301554, campo="ultimaDataDeEscrita", df=3 >
+
+===== // =====
+
+Nao existe informação de frequências em "conteudo"
+(criar índice para campo "conteudo" com "Field.TermVector")
