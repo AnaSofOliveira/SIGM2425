@@ -1,0 +1,51 @@
+--#############
+--# Grupo 04
+--#############
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase fuga_selvagem
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+--------------------------------------------
+--------------------------------------------
+-- Simulacao de perseguicao:
+-- [2] Executar as linhas (A) e (B) em ciclo
+-- (e.g., OBJECTo com id=1 atras de id=2 
+--  com velocidade-de-perseguicao=0.2)
+--------------------------------------------
+--------------------------------------------
+
+\echo -> Remover todas as views: 
+DO $$ 
+DECLARE 
+    r RECORD;
+BEGIN 
+    FOR r IN (SELECT table_name FROM information_schema.views WHERE table_schema = 'public' AND table_name != 'geography_columns' AND table_name != 'geometry_columns') 
+    LOOP 
+        EXECUTE 'DROP VIEW IF EXISTS ' || quote_ident(r.table_name) || ' CASCADE'; 
+    END LOOP; 
+END $$;
+\echo -> Views removidas.
+
+\echo
+\echo -> Iniciar Simulacao: 
+DO $$
+DECLARE
+    nInteracoes int;
+BEGIN
+    nInteracoes := 50;
+    PERFORM simular_perseguicao(nInteracoes);
+    PERFORM criar_views_objetos();
+    PERFORM criar_views_terrenos();
+END $$;
+\echo -> Simulacao Terminada. 
+
