@@ -1,0 +1,61 @@
+--#############
+--# GRUPO 04
+--#############
+
+
+--=============
+-- Liga��o � BD
+--=============
+\set dataBase my_gis_top
+;
+\set userName postgres
+;
+\connect :dataBase :userName
+;
+--==========================
+--==========================
+
+
+
+--______________________________________________
+-- AJUSTAR DE ACORDO COM O CENARIO QUE IDEALIZOU
+------------------------------------------------
+
+
+
+--=============
+-- Geometria 0D
+--=============
+DELETE FROM geo_0d;
+
+INSERT INTO geo_0d (id, nome, geo) VALUES 
+(1,'ISEL',ST_GeomFromText('POINT(10.00 10.00)')),
+(2,'PingoDoce',ST_GeomFromText('POINT(10.00 15.00)')),
+(3,'CEPSA',ST_GeomFromText('POINT(10.00 30.00)')),
+(4,'Metro',ST_GeomFromText('POINT(0.00 0.00)')),
+(5,'RTP',ST_GeomFromText('POINT(15.00 25.00)'));
+
+--=============
+-- Geometria 1D
+--=============
+DELETE FROM geo_1d;
+
+INSERT INTO geo_1d (id, nome, geo)
+VALUES 
+(1, 'E1', ST_GeomFromText('LINESTRING(10.00 10.00, 10.00 40.00)')),
+(2, 'E2', ST_GeomFromText('LINESTRING(10.00 11.00, 10.00 39.00)')),
+(3, 'E3', ST_GeomFromText('LINESTRING(8.00 30.00, 15.00 30.00)')),
+(4, 'E4', ST_GeomFromText('LINESTRING(11.00 33.00, 15.00 33.00)')),
+(5, 'E5', ST_GeomFromText('LINESTRING(10.00 11.00, 10.00 25.00, 15.00 25.00)')),
+(6, 'E6', ST_GeomFromText('LINESTRING(10.00 35.00, 12.00 35.00)')),
+(7, 'E7', ST_GeomFromText('LINESTRING(0.00 10.00, 0.00 40.00)')),
+(8, 'E8', ST_GeomFromText('LINESTRING(12.00 28.00, 17.00 28.00)')),
+(9, 'E9', ST_GeomFromText('LINESTRING(5.00 20.00, 20.00 20.00)'));
+
+--=============
+-- Geometria 2D
+--=============
+DELETE FROM geo_2d;
+
+INSERT INTO geo_2d (id, nome, geo) VALUES 
+(1, 'Chelas', ST_GeomFromText('POLYGON((10.00 10.00, 10.00 40.00, 20.00 30.00, 10.00 10.00))'));

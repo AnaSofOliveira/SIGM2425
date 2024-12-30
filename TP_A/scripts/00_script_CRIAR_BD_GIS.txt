@@ -1,0 +1,53 @@
+--#############
+--# GRUPO 04
+--#############
+
+-------------------
+-- Dados da Conexao
+-------------------
+\set userName postgres
+\set hostName localhost
+\set portNumber 5432
+
+-------------
+-- Nome da BD
+-------------
+\set dataBase sigm_db_tpa
+
+-------------
+-- Extensões
+-------------
+\set extensionPostGis postgis
+;
+--_____________________________________
+-- Remover a BD
+--_____________________________________
+\echo
+\echo "Remover Base de Dados" :dataBase
+;
+DROP DATABASE IF EXISTS :dataBase
+;
+
+--_____________________________________
+-- Criar a BD
+--_____________________________________
+\echo
+\echo "Criar Base de Dados" :dataBase
+;
+CREATE DATABASE :dataBase
+;
+
+\echo
+\echo "Estabelecer Conexao com a Base de Dados" :dataBase
+;
+\c :dataBase :userName :hostName :portNumber
+;
+
+\echo
+\echo "Aplicar o Extensor " :extension " na Base de Dados" :dataBase
+;
+CREATE EXTENSION :extensionPostGis
+;
+
+
+
